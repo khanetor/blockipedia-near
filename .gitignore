@@ -16,3 +16,5 @@ Cargo.lock
 
 /target
 #Cargo.lock
+neardev/dev-account.env
+neardev/dev-account
