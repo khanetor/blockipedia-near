@@ -1,5 +1,5 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::collections::{UnorderedMap, Vector};
+use near_sdk::collections::UnorderedMap;
 use near_sdk::{env, near_bindgen, AccountId};
 use serde::{Deserialize, Serialize};
 
@@ -11,6 +11,8 @@ pub struct Article {
     title: String,
     content: String,
     author: AccountId,
+    upvote: u8,
+    download: u8,
 }
 
 #[derive(Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
@@ -20,11 +22,23 @@ pub struct ArticleMeta {
     editors: Vec<AccountId>,
 }
 
+#[derive(BorshDeserialize, BorshSerialize, Default)]
+pub struct Rating {
+    upvote: u8,
+    downvote: u8,
+}
+
+enum RatingAction {
+    Upvote,
+    Downvote,
+}
+
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Wiki {
     meta: UnorderedMap<u64, ArticleMeta>,
     corpus: UnorderedMap<u64, String>,
+    ratings: UnorderedMap<u64, Rating>,
 }
 
 impl Default for Wiki {
@@ -32,6 +46,7 @@ impl Default for Wiki {
         Self {
             meta: UnorderedMap::new(b"meta".to_vec()),
             corpus: UnorderedMap::new(b"corpus".to_vec()),
+            ratings: UnorderedMap::new(b"ratings".to_vec()),
         }
     }
 }
@@ -50,16 +65,21 @@ impl Wiki {
             author: String::from("Not found"),
             editors: vec![],
         });
+
         let content = self
             .corpus
             .get(&article_id)
             .unwrap_or(String::from("Content not available"));
+
+        let rating = self.ratings.get(&article_id).unwrap_or(Rating::default());
 
         return Article {
             id: article_id,
             title: meta.title,
             content: content,
             author: meta.author,
+            upvote: rating.upvote,
+            download: rating.downvote,
         };
     }
 
@@ -114,7 +134,26 @@ impl Wiki {
     // if upvote/downvote ratio is 3:7, then article will be removed
 
     // Upvote or download an article
-    pub fn upvote(&mut self, article_id: u64) {}
+    fn rate(&mut self, article_id: u64, action: RatingAction) {
+        let mut rating = self.ratings.get(&article_id).unwrap_or(Rating {
+            upvote: 0,
+            downvote: 0,
+        });
+        match action {
+            RatingAction::Upvote => rating.upvote += 1,
+            RatingAction::Downvote => rating.downvote += 1,
+        }
+
+        self.ratings.insert(&article_id, &rating);
+    }
+
+    pub fn upvote(&mut self, article_id: u64) {
+        self.rate(article_id, RatingAction::Upvote)
+    }
+
+    pub fn downvote(&mut self, article_id: u64) {
+        self.rate(article_id, RatingAction::Downvote)
+    }
 
     // Donate to an article
 }
