@@ -1,7 +1,7 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{UnorderedMap, Vector};
 use near_sdk::{env, near_bindgen, AccountId};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 near_sdk::setup_alloc!();
 
@@ -17,6 +17,7 @@ pub struct Article {
 pub struct ArticleMeta {
     title: String,
     author: AccountId,
+    editors: Vec<AccountId>,
 }
 
 #[near_bindgen]
@@ -47,6 +48,7 @@ impl Wiki {
         let meta = self.meta.get(&article_id).unwrap_or(ArticleMeta {
             title: String::from("Not found"),
             author: String::from("Not found"),
+            editors: vec![],
         });
         let content = self
             .corpus
@@ -70,8 +72,9 @@ impl Wiki {
     #[payable]
     pub fn create_article(&mut self, title: String, content: String) -> u64 {
         // Should panic when not enough fund
-        
+
         let author = env::current_account_id();
+        let editor = author.clone();
         let published_date = env::block_timestamp();
 
         env::log(format!("Article created at {}", published_date).as_bytes());
@@ -81,6 +84,7 @@ impl Wiki {
         let meta = ArticleMeta {
             title: title,
             author: author,
+            editors: vec![editor],
         };
 
         self.meta.insert(&article_id, &meta);
@@ -94,9 +98,14 @@ impl Wiki {
     pub fn update_article(&mut self, article_id: u64, content: String) {
         // Should panic when not enough fund
 
+        let editor = env::current_account_id();
+
         match self.corpus.get(&article_id) {
-            Some(_old_content) => {
+            Some(_) => {
+                let mut meta = self.meta.get(&article_id).unwrap();
+                meta.editors.push(editor);
                 self.corpus.insert(&article_id, &content);
+                self.meta.insert(&article_id, &meta);
             }
             None => env::log("Article not found".as_bytes()),
         }
@@ -105,6 +114,7 @@ impl Wiki {
     // if upvote/downvote ratio is 3:7, then article will be removed
 
     // Upvote or download an article
+    pub fn upvote(&mut self, article_id: u64) {}
 
     // Donate to an article
 }
