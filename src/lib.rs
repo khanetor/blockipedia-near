@@ -1,37 +1,11 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
-use near_sdk::{env, near_bindgen, AccountId};
-use serde::{Deserialize, Serialize};
+use near_sdk::{env, near_bindgen, Promise};
+
+mod models;
+use models::{Article, ArticleMeta, Rating, RatingAction};
 
 near_sdk::setup_alloc!();
-
-#[derive(Serialize)]
-pub struct Article {
-    id: u64,
-    title: String,
-    content: String,
-    author: AccountId,
-    upvote: u8,
-    download: u8,
-}
-
-#[derive(Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
-pub struct ArticleMeta {
-    title: String,
-    author: AccountId,
-    editors: Vec<AccountId>,
-}
-
-#[derive(BorshDeserialize, BorshSerialize, Default)]
-pub struct Rating {
-    upvote: u8,
-    downvote: u8,
-}
-
-enum RatingAction {
-    Upvote,
-    Downvote,
-}
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
@@ -64,6 +38,7 @@ impl Wiki {
             title: String::from("Not found"),
             author: String::from("Not found"),
             editors: vec![],
+            published_date: 0,
         });
 
         let content = self
@@ -78,6 +53,7 @@ impl Wiki {
             title: meta.title,
             content: content,
             author: meta.author,
+            published_date: meta.published_date,
             upvote: rating.upvote,
             download: rating.downvote,
         };
@@ -91,9 +67,11 @@ impl Wiki {
     // Create a new article for 2 NEARs
     #[payable]
     pub fn create_article(&mut self, title: String, content: String) -> u64 {
-        // Should panic when not enough fund
+        if env::attached_deposit() < 2 {
+            env::panic("Not enough fund to create article".as_bytes());
+        }
 
-        let author = env::current_account_id();
+        let author = env::signer_account_id();
         let editor = author.clone();
         let published_date = env::block_timestamp();
 
@@ -105,7 +83,11 @@ impl Wiki {
             title: title,
             author: author,
             editors: vec![editor],
+            published_date: published_date,
         };
+
+        // pay
+        Promise::new(env::current_account_id()).transfer(2);
 
         self.meta.insert(&article_id, &meta);
         self.corpus.insert(&article_id, &content);
@@ -130,8 +112,6 @@ impl Wiki {
             None => env::log("Article not found".as_bytes()),
         }
     }
-
-    // if upvote/downvote ratio is 3:7, then article will be removed
 
     // Upvote or download an article
     fn rate(&mut self, article_id: u64, action: RatingAction) {
@@ -190,5 +170,34 @@ mod tests {
         testing_env!(context);
 
         let mut contract = Wiki::default();
+
+        let article1_id = contract.create_article(
+            String::from("Test article"),
+            String::from("This is a content of a test article."),
+        );
+        let article2_id = contract.create_article(
+            String::from("Test article 2"),
+            String::from("This is a content of another test article."),
+        );
+
+        let article1 = contract.get_article(article1_id);
+
+        // Article ids should be correct
+        assert_eq!(article1_id, 0, "First article should have id 0.");
+        assert_eq!(article2_id, 1, "Second article should have id 1.");
+
+        // Article created with correct data
+        assert_eq!(article1.title, String::from("Test article"), "Incorrect title");
+        assert_eq!(
+            article1.content,
+            String::from("This is a content of a test article."),
+            "Incorrect content"
+        );
+        assert_eq!(article1.id, article1_id, "Incorrect article id");
+        assert_eq!(article1.published_date, env::block_timestamp(), "Incorrect published date");
+        assert_eq!(article1.author, "robert.testnet", "Incorrect author");
+
+        // Account should be charged
+        assert_eq!(env::account_balance(), 1001, "Article creation does not charge.");
     }
 }
