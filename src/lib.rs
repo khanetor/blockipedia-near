@@ -1,37 +1,11 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
-use near_sdk::{env, near_bindgen, AccountId};
-use serde::{Deserialize, Serialize};
+use near_sdk::{env, near_bindgen};
+
+mod models;
+use models::{Article, ArticleMeta, Rating, RatingAction};
 
 near_sdk::setup_alloc!();
-
-#[derive(Serialize)]
-pub struct Article {
-    id: u64,
-    title: String,
-    content: String,
-    author: AccountId,
-    upvote: u8,
-    download: u8,
-}
-
-#[derive(Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
-pub struct ArticleMeta {
-    title: String,
-    author: AccountId,
-    editors: Vec<AccountId>,
-}
-
-#[derive(BorshDeserialize, BorshSerialize, Default)]
-pub struct Rating {
-    upvote: u8,
-    downvote: u8,
-}
-
-enum RatingAction {
-    Upvote,
-    Downvote,
-}
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
