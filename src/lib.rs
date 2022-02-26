@@ -96,10 +96,10 @@ impl Wiki {
     #[payable]
     pub fn update_article(&mut self, article_id: u64, content: String) {
         if env::attached_deposit() < ONE_NEAR / 2 {
-            env::panic("Not enough fund to create article".as_bytes());
+            env::panic("Not enough fund to update article".as_bytes());
         }
 
-        let editor = env::current_account_id();
+        let editor = env::signer_account_id();
 
         match self.corpus.get(&article_id) {
             Some(_) => {
@@ -206,7 +206,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
+    #[should_panic(expected = "Not enough fund to create article")]
     fn create_article_with_insufficient_fund() {
         let context = get_context(vec![], false, ONE_NEAR);
         testing_env!(context);
@@ -217,5 +217,32 @@ mod tests {
             String::from("Test article"),
             String::from("This is a content of a test article."),
         );
+    }
+
+    #[test]
+    fn update_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 3);
+        testing_env!(context);
+
+        let mut contract = Wiki::default();
+
+        let id = contract.create_article(String::from("Title"), String::from("Some content"));
+
+        contract.update_article(id, String::from("This is the updated content."));
+
+        let article = contract.get_article(id);
+
+        assert_eq!(article.content, String::from("This is the updated content."));
+    }
+
+    #[test]
+    #[should_panic(expected = "Not enough fund to update article")]
+    fn update_article_with_insufficient_fund() {
+        let context = get_context(vec![], false, ONE_NEAR / 2 - 1);
+        testing_env!(context);
+
+        let mut contract = Wiki::default();
+
+        contract.update_article(0, String::from("This is the updated content."));
     }
 }
