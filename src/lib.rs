@@ -1,9 +1,9 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
-use near_sdk::{env, near_bindgen, Promise};
+use near_sdk::{env, near_bindgen};
 
 mod models;
-use models::{Article, ArticleMeta, Rating, RatingAction};
+use models::{Article, ArticleMeta, Rating, RatingAction, ONE_NEAR};
 
 near_sdk::setup_alloc!();
 
@@ -67,7 +67,7 @@ impl Wiki {
     // Create a new article for 2 NEARs
     #[payable]
     pub fn create_article(&mut self, title: String, content: String) -> u64 {
-        if env::attached_deposit() < 2 {
+        if env::attached_deposit() < 2 * ONE_NEAR {
             env::panic("Not enough fund to create article".as_bytes());
         }
 
@@ -86,9 +86,6 @@ impl Wiki {
             published_date: published_date,
         };
 
-        // pay
-        Promise::new(env::current_account_id()).transfer(2);
-
         self.meta.insert(&article_id, &meta);
         self.corpus.insert(&article_id, &content);
 
@@ -98,7 +95,9 @@ impl Wiki {
     // Edit an existing article for 0.5 NEARs
     #[payable]
     pub fn update_article(&mut self, article_id: u64, content: String) {
-        // Should panic when not enough fund
+        if env::attached_deposit() < ONE_NEAR / 2 {
+            env::panic("Not enough fund to create article".as_bytes());
+        }
 
         let editor = env::current_account_id();
 
@@ -144,7 +143,7 @@ mod tests {
     use super::*;
     use near_sdk::{testing_env, MockedBlockchain, VMContext};
 
-    fn get_context(input: Vec<u8>, is_view: bool) -> VMContext {
+    fn get_context(input: Vec<u8>, is_view: bool, deposit: u128) -> VMContext {
         VMContext {
             current_account_id: "alice.testnet".to_string(),
             signer_account_id: "robert.testnet".to_string(),
@@ -153,10 +152,10 @@ mod tests {
             input,
             block_index: 0,
             block_timestamp: 0,
-            account_balance: 1000,
-            account_locked_balance: 10,
+            account_balance: ONE_NEAR * 10,
+            account_locked_balance: ONE_NEAR * 10,
             storage_usage: 0,
-            attached_deposit: 5,
+            attached_deposit: deposit,
             prepaid_gas: 10u64.pow(18),
             random_seed: vec![0, 1, 2],
             is_view,
@@ -166,7 +165,7 @@ mod tests {
     }
     #[test]
     fn create_an_article() {
-        let context = get_context(vec![], false);
+        let context = get_context(vec![], false, 2 * ONE_NEAR);
         testing_env!(context);
 
         let mut contract = Wiki::default();
@@ -187,17 +186,36 @@ mod tests {
         assert_eq!(article2_id, 1, "Second article should have id 1.");
 
         // Article created with correct data
-        assert_eq!(article1.title, String::from("Test article"), "Incorrect title");
+        assert_eq!(
+            article1.title,
+            String::from("Test article"),
+            "Incorrect title"
+        );
         assert_eq!(
             article1.content,
             String::from("This is a content of a test article."),
             "Incorrect content"
         );
         assert_eq!(article1.id, article1_id, "Incorrect article id");
-        assert_eq!(article1.published_date, env::block_timestamp(), "Incorrect published date");
+        assert_eq!(
+            article1.published_date,
+            env::block_timestamp(),
+            "Incorrect published date"
+        );
         assert_eq!(article1.author, "robert.testnet", "Incorrect author");
+    }
 
-        // Account should be charged
-        assert_eq!(env::account_balance(), 1001, "Article creation does not charge.");
+    #[test]
+    #[should_panic]
+    fn create_article_with_insufficient_fund() {
+        let context = get_context(vec![], false, ONE_NEAR);
+        testing_env!(context);
+
+        let mut contract = Wiki::default();
+
+        contract.create_article(
+            String::from("Test article"),
+            String::from("This is a content of a test article."),
+        );
     }
 }

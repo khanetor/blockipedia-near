@@ -2,6 +2,8 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::AccountId;
 use serde::{Deserialize, Serialize};
 
+pub static ONE_NEAR: u128 = 10u128.pow(24);
+
 #[derive(Serialize)]
 pub struct Article {
     pub id: u64,
