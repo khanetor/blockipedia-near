@@ -276,7 +276,7 @@ mod tests {
     }
 
     #[test]
-    fn do_upvote_on_existent_article() {
+    fn do_upvote_on_existing_article() {
         let context = get_context(vec![], false, ONE_NEAR * 2);
         testing_env!(context);
         let mut contract = Wiki::default();
