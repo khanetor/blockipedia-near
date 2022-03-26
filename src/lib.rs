@@ -5,7 +5,8 @@ use near_sdk::{env, near_bindgen};
 mod models;
 use models::{Article, ArticleMeta, Rating, RatingAction, ONE_NEAR};
 
-const ERR_ARTICLE_NOT_FOUND: &str = "Article not found";
+mod constants;
+use constants::ERR_ARTICLE_NOT_FOUND;
 
 near_sdk::setup_alloc!();
 
