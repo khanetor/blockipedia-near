@@ -111,7 +111,9 @@ impl Wiki {
                 self.corpus.insert(&article_id, &content);
                 self.meta.insert(&article_id, &meta);
             }
-            None => env::log(ERR_ARTICLE_NOT_FOUND.as_bytes()),
+            None => {
+                env::panic(ERR_ARTICLE_NOT_FOUND.as_bytes())
+            }
         }
     }
 
@@ -250,6 +252,17 @@ mod tests {
     #[should_panic(expected = "Not enough fund to update article")]
     fn update_article_with_insufficient_fund() {
         let context = get_context(vec![], false, ONE_NEAR / 2 - 1);
+        testing_env!(context);
+
+        let mut contract = Wiki::default();
+
+        contract.update_article(0, String::from("This is the updated content."));
+    }
+
+    #[test]
+    #[should_panic(expected = "Article not found")]
+    fn update_nonexistent_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 3);
         testing_env!(context);
 
         let mut contract = Wiki::default();
