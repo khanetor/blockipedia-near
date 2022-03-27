@@ -1,0 +1,7 @@
+.landing {
+  @apply bg-slate-400 px-32 py-10 flex justify-center items-center;
+}
+
+.tagline {
+  @apply font-mono font-semibold text-6xl;
+}
