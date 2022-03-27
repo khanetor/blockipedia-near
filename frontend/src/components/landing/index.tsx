@@ -1,5 +1,5 @@
 import React from "react"
-import { landing, tagline } from "./landing.module.css"
+import { landing, tagline } from "./style.module.css"
 
 export default function () {
     return <>
