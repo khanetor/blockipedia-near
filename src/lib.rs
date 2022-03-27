@@ -5,6 +5,9 @@ use near_sdk::{env, near_bindgen};
 mod models;
 use models::{Article, ArticleMeta, Rating, RatingAction, ONE_NEAR};
 
+mod constants;
+use constants::ERR_ARTICLE_NOT_FOUND;
+
 near_sdk::setup_alloc!();
 
 #[near_bindgen]
@@ -108,12 +111,21 @@ impl Wiki {
                 self.corpus.insert(&article_id, &content);
                 self.meta.insert(&article_id, &meta);
             }
-            None => env::log("Article not found".as_bytes()),
+            None => {
+                env::panic(ERR_ARTICLE_NOT_FOUND.as_bytes())
+            }
         }
     }
 
     // Upvote or download an article
     fn rate(&mut self, article_id: u64, action: RatingAction) {
+
+        // panic if the article doesn't exist
+        let meta = self.meta.get(&article_id);
+        if meta.is_none() {
+            env::panic(ERR_ARTICLE_NOT_FOUND.as_bytes());
+        }
+
         let mut rating = self.ratings.get(&article_id).unwrap_or(Rating {
             upvote: 0,
             downvote: 0,
@@ -163,6 +175,7 @@ mod tests {
             epoch_height: 19,
         }
     }
+
     #[test]
     fn create_an_article() {
         let context = get_context(vec![], false, 2 * ONE_NEAR);
@@ -244,5 +257,56 @@ mod tests {
         let mut contract = Wiki::default();
 
         contract.update_article(0, String::from("This is the updated content."));
+    }
+
+    #[test]
+    #[should_panic(expected = "Article not found")]
+    fn update_nonexistent_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 3);
+        testing_env!(context);
+
+        let mut contract = Wiki::default();
+
+        contract.update_article(0, String::from("This is the updated content."));
+    }
+
+    #[test]
+    #[should_panic(expected = "Article not found")]
+    fn do_upvote_on_nonexistent_article() {
+        let context = get_context(vec![], false, 0);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        contract.upvote(0);
+    }
+
+    #[test]
+    #[should_panic(expected = "Article not found")]
+    fn do_downvote_on_nonexistent_article() {
+        let context = get_context(vec![], false, 0);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        contract.downvote(0);
+    }
+
+    #[test]
+    fn do_upvote_on_existing_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 2);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        let id = contract.create_article(String::from("Title"), String::from("Content"));
+        contract.upvote(id);
+        let ratings = contract.ratings.get(&id).unwrap();
+        assert_eq!(ratings.upvote, 1);
+    }
+
+    #[test]
+    fn do_downvote_on_existent_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 2);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        let id = contract.create_article(String::from("Title"), String::from("Content"));
+        contract.downvote(id);
+        let ratings = contract.ratings.get(&id).unwrap();
+        assert_eq!(ratings.downvote, 1);
     }
 }
