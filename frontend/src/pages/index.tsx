@@ -1,6 +1,9 @@
 import React from "react"
+import { Helmet } from "react-helmet"
+
 import ArticleView, { Article } from "../components/article"
 import Landing from "../components/landing"
+
 import { content } from "./index.module.css"
 
 export default function () {
@@ -15,6 +18,9 @@ export default function () {
   ]
 
   return <>
+    <Helmet>
+      <title>Blockipedia - Welcome</title>
+    </Helmet>
     <Landing></Landing>
     <div className={content}>
       {articles.map(a => <ArticleView article={a}></ArticleView>)}
