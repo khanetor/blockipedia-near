@@ -1,5 +1,9 @@
 .header {
-  @apply bg-slate-400 flex flex-row justify-between items-center px-32 py-5 border-black border-b;
+  @apply bg-slate-400 flex flex-row justify-between items-center px-32 py-5 border-black border-b sticky top-0;
+}
+
+.branding {
+  @apply font-francois-one text-4xl;
 }
 
 .links {
