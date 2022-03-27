@@ -14,7 +14,7 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "typecheck": "tsc --noEmit",
-    "generate:css": "tcm -p -w 'src/**/*.module.css' ."
+    "generate:css": "tcm -w -p 'src/**/*.module.css' ."
   },
   "dependencies": {
     "gatsby": "^4.10.3",
