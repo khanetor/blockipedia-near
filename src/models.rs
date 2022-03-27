@@ -12,9 +12,10 @@ pub struct Article {
     pub author: AccountId,
     pub published_date: u64,
     pub upvote: u8,
-    pub download: u8,
+    pub downvote: u8,
 }
 
+#[cfg_attr(test, derive(Debug))] // add Debug trait for this struct only when running tests
 #[derive(Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
 pub struct ArticleMeta {
     pub title: String,
