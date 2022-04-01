@@ -17,6 +17,7 @@
     "generate:css": "tcm -w -p 'src/**/*.module.css' ."
   },
   "dependencies": {
+    "buffer": "^6.0.3",
     "gatsby": "^4.10.3",
     "gatsby-plugin-image": "^2.10.1",
     "gatsby-plugin-postcss": "^5.10.0",
