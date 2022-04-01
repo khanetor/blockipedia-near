@@ -23,7 +23,7 @@ export default function () {
     </Helmet>
     <Landing></Landing>
     <div className={content}>
-      {articles.map(a => <ArticleView article={a}></ArticleView>)}
+      {articles.map(a => <ArticleView article={a} key={a.id}></ArticleView>)}
     </div>
   </>
 }
