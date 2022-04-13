@@ -11,6 +11,10 @@ use constants::ERR_ARTICLE_NOT_FOUND;
 // the upvote/downvote ratio, below which the article is hidden away (#12)
 const ARTICLE_VISIBILITY_VOTING_RATIO: f32 = 3.0 / 7.0;
 
+// sane constraints for donation amount
+const MIN_DONATION_AMOUNT: f32 = 1.0;
+const MAX_DONATION_AMOUNT: f32 = 100.0;
+
 near_sdk::setup_alloc!();
 
 #[near_bindgen]
@@ -63,6 +67,13 @@ impl Wiki {
             upvote: rating.upvote,
             downvote: rating.downvote,
         };
+    }
+
+    fn panic_on_nonexistent_article(&self, article_id: u64) {
+        let meta = self.meta.get(&article_id);
+        if meta.is_none() {
+            env::panic(ERR_ARTICLE_NOT_FOUND.as_bytes());
+        }
     }
 
     // Get a list of articles
@@ -153,11 +164,7 @@ impl Wiki {
     // Upvote or download an article
     fn rate(&mut self, article_id: u64, action: RatingAction) {
 
-        // panic if the article doesn't exist
-        let meta = self.meta.get(&article_id);
-        if meta.is_none() {
-            env::panic(ERR_ARTICLE_NOT_FOUND.as_bytes());
-        }
+        self.panic_on_nonexistent_article(article_id);
 
         let mut rating = self.ratings.get(&article_id).unwrap_or(Rating {
             upvote: 0,
@@ -180,6 +187,21 @@ impl Wiki {
     }
 
     // Donate to an article
+    #[payable]
+    pub fn donate(&mut self, article_id: u64, donation_amt: f32) {
+
+        self.panic_on_nonexistent_article(article_id);
+
+        if donation_amt.lt(&MIN_DONATION_AMOUNT) {
+            env::panic(format!("Donation amount cannot be less than {:?}", MIN_DONATION_AMOUNT).as_bytes());
+        }
+        if donation_amt.gt(&MAX_DONATION_AMOUNT) {
+            env::panic(format!("Donation amount cannot be greater than {:?}", MAX_DONATION_AMOUNT).as_bytes());
+        }
+
+        // @TODO define the business logic where donation amount is split among the author and contributors
+
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -344,6 +366,15 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "Article not found")]
+    fn panic_on_nonexistent_article() {
+        let context = get_context(vec![], false, 0);
+        testing_env!(context);
+        let contract = Wiki::default();
+        contract.panic_on_nonexistent_article(0);
+    }
+
+    #[test]
+    #[should_panic(expected = "Article not found")]
     fn update_nonexistent_article() {
         let context = get_context(vec![], false, ONE_NEAR * 3);
         testing_env!(context);
@@ -391,5 +422,34 @@ mod tests {
         contract.downvote(id);
         let ratings = contract.ratings.get(&id).unwrap();
         assert_eq!(ratings.downvote, 1);
+    }
+
+    #[test]
+    #[should_panic(expected = "Article not found")]
+    fn donate_to_nonexistent_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 2);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        contract.donate(0, 1.0);
+    }
+
+    #[test]
+    #[should_panic(expected = "Donation amount cannot be less than")]
+    fn donate_too_little_to_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 2);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        let id = contract.create_article(String::from("Title"), String::from("Content"));
+        contract.donate(id, 0.0);
+    }
+
+    #[test]
+    #[should_panic(expected = "Donation amount cannot be greater than")]
+    fn donate_too_much_to_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 2);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        let id = contract.create_article(String::from("Title"), String::from("Content"));
+        contract.donate(id, 100.01);
     }
 }
