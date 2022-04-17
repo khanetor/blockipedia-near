@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   deploy-page:
@@ -46,6 +49,10 @@ jobs:
       - name: Typecheck
         working-directory: ${{ matrix.frontend-dir }}
         run: yarn typecheck
+      
+      - name: Generate static Pages
+        working-directory: ${{ matrix.frontend-dir }}
+        run: yarn build
       
       - name: Deploy To GitHub Pages
         working-directory: ${{ matrix.frontend-dir }}
