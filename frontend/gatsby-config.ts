@@ -2,9 +2,10 @@ import type { GatsbyConfig } from "gatsby";
 
 const config: GatsbyConfig = {
   siteMetadata: {
-    title: ``,
-    siteUrl: `https://www.yourdomain.tld`
+    title: `Blockipedia`,
+    siteUrl: `https://nlhkh.github.io/blockipedia-near`
   },
+  pathPrefix: "/blockipedia-near",
   plugins: [
     "gatsby-plugin-postcss",
     "gatsby-plugin-image",

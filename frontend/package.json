@@ -14,7 +14,8 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "typecheck": "tsc --noEmit",
-    "generate:css": "tcm -w -p 'src/**/*.module.css' ."
+    "generate:css": "tcm -w -p 'src/**/*.module.css' .",
+    "deploy": "gatsby build --prefix-paths && gh-pages -d public"
   },
   "dependencies": {
     "buffer": "^6.0.3",
@@ -40,6 +41,7 @@
     "@types/react-helmet": "^6.1.5",
     "autoprefixer": "^10.4.4",
     "gatsby-plugin-layout": "^3.10.0",
+    "gh-pages": "^3.2.3",
     "typed-css-modules": "^0.7.0",
     "typescript": "^4.6.2"
   }
