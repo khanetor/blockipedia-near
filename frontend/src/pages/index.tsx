@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet"
 
 import ArticleView, { Article } from "../components/article"
 import Landing from "../components/landing"
+import { useWallet } from "../components/nearAuth"
 
 import { content } from "./index.module.css"
 

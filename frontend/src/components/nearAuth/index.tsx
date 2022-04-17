@@ -1,4 +1,5 @@
 import { WalletConnection } from "near-api-js"
+import { navigate } from "gatsby"
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
 import { getNearWallet, signIn, signOut } from "../../near-wallet"
 
@@ -30,18 +31,36 @@ export function WalletProvider(props: { children: ReactNode }) {
 
     useEffect(function () {
         getNearWallet().then(w => {
-            setWallet(w)
             setAuthenticated(w.isSignedIn())
+            setWallet(w)
         })
     }, [])
-
-    const iWallet: IWallet = { authenticated, login, logout }
 
     if (wallet === undefined) {
         return <div>Loading wallet...</div>
     } else {
+        const iWallet: IWallet = { authenticated, login, logout }
+        console.log("Debug")
+        console.log(iWallet)
         return <NEARContext.Provider value={iWallet}>
             {props.children}
         </NEARContext.Provider>
+    }
+}
+
+export function NEARAuth(props: { children: ReactNode }) {
+    const wallet = useWallet()
+
+    useEffect(function () {
+        if (!wallet!.authenticated) {
+            console.log("navigating to root")
+            navigate("/")
+        }
+    }, [])
+
+    if (wallet?.authenticated) {
+        return <>{props.children}</>
+    } else {
+        return <></>
     }
 }
