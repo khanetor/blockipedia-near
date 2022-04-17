@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkblockipedia=self.webpackChunkblockipedia||[]).push([[872],{2162:function(e,t,n){n.r(t),n.d(t,{default:function(){return a}});var u=n(7294),c=n(6321);function a(){return u.createElement(c.cr,null,"You are authenticated to NEAR")}}}]);
+//# sourceMappingURL=component---src-pages-create-index-tsx-f0d5df19190edabade1b.js.map

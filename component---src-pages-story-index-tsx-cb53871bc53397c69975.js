@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkblockipedia=self.webpackChunkblockipedia||[]).push([[491],{3604:function(e,n,t){t.r(n),t.d(n,{default:function(){return r}});var u=t(7294);function r(){return u.createElement(u.Fragment,null,"This is our story...")}}}]);
+//# sourceMappingURL=component---src-pages-story-index-tsx-cb53871bc53397c69975.js.map
