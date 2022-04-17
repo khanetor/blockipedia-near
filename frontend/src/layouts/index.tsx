@@ -8,9 +8,9 @@ function HeadNav() {
     const wallet = useWallet()
 
     return <nav className={header}>
-        <div className={branding}>Blockipedia</div>
+        <Link className={branding} to="/">Blockipedia</Link>
         <div className={links}>
-            <a className={link}>Our story</a>
+            <Link className={link} to="/story">Our story</Link>
             <Link className={link} to="/create">Write</Link>
             {wallet!.authenticated ?
                 <a className={link} onClick={wallet!.logout}>Sign-out</a> :
