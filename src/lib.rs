@@ -5,6 +5,12 @@ use near_sdk::{env, near_bindgen};
 mod models;
 use models::{Article, ArticleMeta, Rating, RatingAction, ONE_NEAR};
 
+mod constants;
+use constants::ERR_ARTICLE_NOT_FOUND;
+
+// the upvote/downvote ratio, below which the article is hidden away (#12)
+const ARTICLE_VISIBILITY_VOTING_RATIO: f32 = 3.0 / 7.0;
+
 near_sdk::setup_alloc!();
 
 #[near_bindgen]
@@ -55,13 +61,43 @@ impl Wiki {
             author: meta.author,
             published_date: meta.published_date,
             upvote: rating.upvote,
-            download: rating.downvote,
+            downvote: rating.downvote,
         };
     }
 
     // Get a list of articles
     pub fn get_articles(&self) -> Vec<(u64, ArticleMeta)> {
-        return self.meta.to_vec();
+
+        #[cfg(test)]
+        println!("\ninvoking `get_articles`...");
+
+        let mut articles = self.meta.to_vec();
+        articles.retain(|rec| {
+
+            let (id, _) = rec;
+            let ratings = self.ratings.get(id).unwrap_or(Rating {
+                upvote: 0,
+                downvote: 0,
+            });
+            let mut ups = ratings.upvote;
+            let mut downs = ratings.downvote;
+
+            // prevent the "division by 0" case
+            if downs == 0 { ups += 1; downs += 1; }
+
+            let ratio: f32 = ups as f32 / downs as f32;
+
+            #[cfg(test)]
+            println!("record {:?}: up {:?}, down {:?}, ratio {:.2}, threshold {:.2}", id, ups, downs, ratio, ARTICLE_VISIBILITY_VOTING_RATIO);
+
+            return ratio.gt(&ARTICLE_VISIBILITY_VOTING_RATIO);
+
+        });
+
+        #[cfg(test)]
+        println!("done invoking `get_articles`\n");
+
+        return articles;
     }
 
     // Create a new article for 2 NEARs
@@ -108,12 +144,21 @@ impl Wiki {
                 self.corpus.insert(&article_id, &content);
                 self.meta.insert(&article_id, &meta);
             }
-            None => env::log("Article not found".as_bytes()),
+            None => {
+                env::panic(ERR_ARTICLE_NOT_FOUND.as_bytes())
+            }
         }
     }
 
     // Upvote or download an article
     fn rate(&mut self, article_id: u64, action: RatingAction) {
+
+        // panic if the article doesn't exist
+        let meta = self.meta.get(&article_id);
+        if meta.is_none() {
+            env::panic(ERR_ARTICLE_NOT_FOUND.as_bytes());
+        }
+
         let mut rating = self.ratings.get(&article_id).unwrap_or(Rating {
             upvote: 0,
             downvote: 0,
@@ -163,6 +208,7 @@ mod tests {
             epoch_height: 19,
         }
     }
+
     #[test]
     fn create_an_article() {
         let context = get_context(vec![], false, 2 * ONE_NEAR);
@@ -206,6 +252,56 @@ mod tests {
     }
 
     #[test]
+    fn get_articles() {
+        let context = get_context(vec![], false, 10 * ONE_NEAR);
+        testing_env!(context);
+
+        //----------------------------------------------------------
+        // should return all articles if non of them has any rating
+
+        let mut contract = Wiki::default();
+        let mut articles = contract.get_articles();
+        assert_eq!(articles.len(), 0, "Initial number of articles must be zero");
+
+        contract.create_article(
+            String::from("Test article 1"),
+            String::from("This is a content of the test article 1."),
+        );
+        articles = contract.get_articles();
+        assert_eq!(articles.len(), 1, "Number of articles must be 1 after creating one article");
+
+        contract.create_article(
+            String::from("Test article 2"),
+            String::from("This is a content of the test article 2."),
+        );
+        contract.create_article(
+            String::from("Test article 3"),
+            String::from("This is a content of the test article 3."),
+        );
+        articles = contract.get_articles();
+        assert_eq!(articles.len(), 3, "Number of articles must be 3 after creating three articles");
+
+        dbg!(articles.len(), articles);
+
+        //-------------------------------------------------------------------
+        // should return only articles with the desired upvote/downvote ratio
+
+        // 3 upvotes
+        for _ in 0..3 { contract.upvote(1); }
+
+        // 7 downvotes
+        for _ in 0..7 { contract.downvote(1); }
+
+        articles = contract.get_articles();
+        assert_eq!(articles.len(), 2, "Number of articles must be 2 after 1 article is downvoted too much");
+
+        contract.upvote(1);
+        articles = contract.get_articles();
+        assert_eq!(articles.len(), 3, "Number of articles must be 3 again after the hidden article achieves the desirable voting ratio");
+
+    }
+
+    #[test]
     #[should_panic(expected = "Not enough fund to create article")]
     fn create_article_with_insufficient_fund() {
         let context = get_context(vec![], false, ONE_NEAR);
@@ -244,5 +340,56 @@ mod tests {
         let mut contract = Wiki::default();
 
         contract.update_article(0, String::from("This is the updated content."));
+    }
+
+    #[test]
+    #[should_panic(expected = "Article not found")]
+    fn update_nonexistent_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 3);
+        testing_env!(context);
+
+        let mut contract = Wiki::default();
+
+        contract.update_article(0, String::from("This is the updated content."));
+    }
+
+    #[test]
+    #[should_panic(expected = "Article not found")]
+    fn do_upvote_on_nonexistent_article() {
+        let context = get_context(vec![], false, 0);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        contract.upvote(0);
+    }
+
+    #[test]
+    #[should_panic(expected = "Article not found")]
+    fn do_downvote_on_nonexistent_article() {
+        let context = get_context(vec![], false, 0);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        contract.downvote(0);
+    }
+
+    #[test]
+    fn do_upvote_on_existing_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 2);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        let id = contract.create_article(String::from("Title"), String::from("Content"));
+        contract.upvote(id);
+        let ratings = contract.ratings.get(&id).unwrap();
+        assert_eq!(ratings.upvote, 1);
+    }
+
+    #[test]
+    fn do_downvote_on_existent_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 2);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        let id = contract.create_article(String::from("Title"), String::from("Content"));
+        contract.downvote(id);
+        let ratings = contract.ratings.get(&id).unwrap();
+        assert_eq!(ratings.downvote, 1);
     }
 }
