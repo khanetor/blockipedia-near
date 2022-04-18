@@ -1,0 +1,19 @@
+.header {
+  @apply bg-slate-400 flex flex-row justify-between items-center px-32 py-5 border-black border-b sticky top-0;
+}
+
+.branding {
+  @apply font-francois-one text-4xl;
+}
+
+.links {
+  @apply flex flex-row gap-6 items-center;
+}
+
+.link {
+  @apply text-sm hover:cursor-pointer;
+}
+
+.linkAction {
+  @apply link bg-black text-white rounded-full p-3 capitalize;
+}
