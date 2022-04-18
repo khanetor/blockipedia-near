@@ -1,0 +1,60 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-page:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16]
+        frontend-dir: ["./frontend"]
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@master
+
+      - name: Setup node env 🏗
+        uses: actions/setup-node@v3.1.1
+        with:
+          node-version: ${{ matrix.node }}
+          check-latest: true
+      
+      - name: Get yarn cache directory path 🛠
+        working-directory: ${{ matrix.frontend-dir }}
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      
+      - name: Cache node_modules 📦
+        uses: actions/cache@v3        
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.frontend-dir }}
+        run: yarn
+      
+      - name: Typecheck
+        working-directory: ${{ matrix.frontend-dir }}
+        run: yarn typecheck
+      
+      - name: Generate static Pages
+        working-directory: ${{ matrix.frontend-dir }}
+        run: yarn build
+      
+      - name: Deploy To GitHub Pages
+        working-directory: ${{ matrix.frontend-dir }}
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          yarn deploy -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
