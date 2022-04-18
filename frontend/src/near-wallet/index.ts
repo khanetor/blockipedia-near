@@ -2,11 +2,11 @@ import { connect, keyStores, WalletConnection, ConnectConfig } from "near-api-js
 
 async function getNearWallet() {
     const config: ConnectConfig = {
-        networkId: "testnet",
+        networkId: process.env.NEAR_NETWORK_ID!,
+        nodeUrl: process.env.NEAR_NODE_URL!,
+        walletUrl: process.env.NEAR_WALLET_URL,
+        helperUrl: process.env.NEAR_HELPER_URL,
         keyStore: new keyStores.BrowserLocalStorageKeyStore(),
-        nodeUrl: "https://rpc.testnet.near.org",
-        walletUrl: "https://wallet.testnet.near.org",
-        helperUrl: "https://helper.testnet.near.org",
         headers: {},
     }
 
@@ -18,8 +18,8 @@ async function getNearWallet() {
 
 async function signIn(wallet: WalletConnection) {
     await wallet.requestSignIn(
-        "khanguyen.testnet", // contract requesting access
-        "Blockipedia"
+        process.env.CONTRACT_ADDRESS,
+        process.env.APP_NAME
     )
 }
 
