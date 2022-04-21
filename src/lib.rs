@@ -50,19 +50,19 @@ impl Wiki {
         let content = self
             .corpus
             .get(&article_id)
-            .unwrap_or(String::from("Content not available"));
+            .unwrap_or_else(|| String::from("Content not available"));
 
-        let rating = self.ratings.get(&article_id).unwrap_or(Rating::default());
+        let rating = self.ratings.get(&article_id).unwrap_or_default();
 
-        return Article {
+        Article {
             id: article_id,
             title: meta.title,
-            content: content,
+            content,
             author: meta.author,
             published_date: meta.published_date,
             upvote: rating.upvote,
             downvote: rating.downvote,
-        };
+        }
     }
 
     // Get a list of articles
@@ -90,14 +90,14 @@ impl Wiki {
             #[cfg(test)]
             println!("record {:?}: up {:?}, down {:?}, ratio {:.2}, threshold {:.2}", id, ups, downs, ratio, ARTICLE_VISIBILITY_VOTING_RATIO);
 
-            return ratio.gt(&ARTICLE_VISIBILITY_VOTING_RATIO);
+            ratio.gt(&ARTICLE_VISIBILITY_VOTING_RATIO)
 
         });
 
         #[cfg(test)]
         println!("done invoking `get_articles`\n");
 
-        return articles;
+        articles
     }
 
     // Create a new article for 2 NEARs
@@ -116,16 +116,16 @@ impl Wiki {
         let article_id = self.corpus.len();
 
         let meta = ArticleMeta {
-            title: title,
-            author: author,
+            title,
+            author,
             editors: vec![editor],
-            published_date: published_date,
+            published_date,
         };
 
         self.meta.insert(&article_id, &meta);
         self.corpus.insert(&article_id, &content);
 
-        return article_id;
+        article_id
     }
 
     // Edit an existing article for 0.5 NEARs
