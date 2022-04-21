@@ -40,8 +40,6 @@ export function WalletProvider(props: { children: ReactNode }) {
         return <div>Loading wallet...</div>
     } else {
         const iWallet: IWallet = { authenticated, login, logout }
-        console.log("Debug")
-        console.log(iWallet)
         return <NEARContext.Provider value={iWallet}>
             {props.children}
         </NEARContext.Provider>
@@ -53,7 +51,6 @@ export function NEARAuth(props: { children: ReactNode }) {
 
     useEffect(function () {
         if (!wallet!.authenticated) {
-            console.log("navigating to root")
             navigate("/")
         }
     }, [])
