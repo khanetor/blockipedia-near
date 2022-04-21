@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm"
 
 import { bodyComposer, composer, editor, preview, heading } from "./index.module.css"
 import { navigate } from "gatsby"
+import { Helmet } from "react-helmet"
 
 export default function () {
     const [title, setTitle] = useState<string>("")
@@ -22,6 +23,9 @@ export default function () {
     const render = content.length > 0 ? content : "Preview"
 
     return <NEARAuth>
+        <Helmet>
+            <title>Blockipedia: {title}</title>
+        </Helmet>
         <div className={composer}>
             <div className={heading}>
                 <input type="text" placeholder="Title" value={title} onChange={e => setTitle(e.target.value)}></input>
