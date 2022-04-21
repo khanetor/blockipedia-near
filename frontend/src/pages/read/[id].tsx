@@ -96,7 +96,7 @@ export default function ArticleReadingView(props: { id: number }) {
                 </div>
             </article>
 
-            {showDonation ? <DonationModal articleId={article.id} dismiss={setShowDonation.bind(null, false)}></DonationModal> : <></>}
+            <DonationModal show={showDonation} articleId={article.id} dismiss={setShowDonation.bind(null, false)}></DonationModal>
         </NEARAuth>
     } else {
         return <NEARAuth>
