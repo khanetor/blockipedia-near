@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet"
 
 import ArticleView, { Article } from "../components/article"
 import Landing from "../components/landing"
-import { useWallet } from "../components/nearAuth"
+import { NEARAuth } from "../components/nearAuth"
 
 import { content } from "./index.module.css"
 
@@ -23,8 +23,11 @@ export default function () {
       <title>Blockipedia - Welcome</title>
     </Helmet>
     <Landing></Landing>
-    <div className={content}>
-      {articles.map(a => <ArticleView article={a} key={a.id}></ArticleView>)}
-    </div>
+
+    <NEARAuth redirect={false}>
+      <div className={content}>
+        {articles.map(a => <ArticleView article={a} key={a.id}></ArticleView>)}
+      </div>
+    </NEARAuth>
   </>
 }
