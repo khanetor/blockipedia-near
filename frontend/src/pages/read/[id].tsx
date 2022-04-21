@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm"
 
 import { DonationModal } from "../../components/donation"
 import { contentSection, headerAction, headerInfo, headerRating, headerSection, readingView, titleSection } from "./[id].module.css"
+import { Helmet } from "react-helmet"
 
 type ArticleDetail = {
     id: number,
@@ -54,6 +55,9 @@ export default function ArticleReadingView(props: { id: number }) {
 
     if (article !== undefined) {
         return <NEARAuth>
+            <Helmet>
+                <title>Blockipedia: {article.title}</title>
+            </Helmet>
             <article className={readingView}>
                 <div className={headerSection}>
                     <div className={headerInfo}>
@@ -96,6 +100,9 @@ export default function ArticleReadingView(props: { id: number }) {
         </NEARAuth>
     } else {
         return <NEARAuth>
+            <Helmet>
+                <title>Blockipedia: Loading...</title>
+            </Helmet>
             <article className={readingView}>
                 Loading article ...
             </article>
