@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "buffer": "^6.0.3",
+    "clsx": "^1.1.1",
     "gatsby": "^4.12.1",
     "near-api-js": "^0.44.2",
     "postcss": "^8.4.12",
