@@ -9,7 +9,7 @@ function HeadNav() {
 
     function getStarted() {
         if (wallet?.authenticated) {
-            navigate("/create")
+            navigate("/write")
         } else {
             wallet?.login()
         }
