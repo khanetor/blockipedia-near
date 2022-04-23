@@ -1,11 +1,10 @@
 import React, { useState } from "react"
 import { NEARAuthRoute } from "../../components/nearAuth"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
 
 import { bodyComposer, composer, editor, preview, heading } from "./index.module.css"
 import { navigate } from "gatsby"
 import { Helmet } from "react-helmet"
+import { MarkdownRenderer } from "../../components/markdown"
 
 export default function () {
     const [title, setTitle] = useState<string>("")
@@ -20,7 +19,7 @@ export default function () {
         console.log(title)
     }
 
-    const render = content.length > 0 ? content : "Preview"
+    const render: string = content.length > 0 ? content : "Preview"
 
     return <NEARAuthRoute>
         <Helmet>
@@ -39,9 +38,7 @@ export default function () {
                     <textarea placeholder="Content" value={content} onChange={e => setContent(e.target.value)}></textarea>
                 </div>
                 <div className={preview}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {render}
-                    </ReactMarkdown>
+                    <MarkdownRenderer>{render}</MarkdownRenderer>
                 </div>
             </div>
         </div>

@@ -39,18 +39,5 @@
 }
 
 .preview {
-  @apply flex-1 p-3 font-open-sans;
-}
-
-/* Fix style for markdown */
-.preview h1 {
-  @apply text-2xl font-bold;
-}
-
-.preview ul {
-  @apply list-disc ml-3;
-}
-
-.preview ol {
-  @apply list-decimal;
+  @apply flex-1 p-3;
 }
