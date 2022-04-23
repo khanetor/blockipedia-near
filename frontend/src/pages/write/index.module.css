@@ -1,0 +1,56 @@
+.composer {
+  @apply mx-32;
+}
+
+.heading {
+  @apply flex flex-row h-14;
+}
+
+.heading input {
+  @apply px-3 my-1 flex-1;
+}
+
+.heading div {
+  @apply flex flex-row gap-2;
+}
+
+.heading div button {
+  @apply rounded-xl capitalize p-3 text-white my-1;
+}
+
+.heading div button:first-child {
+  @apply bg-yellow-500;
+}
+
+.heading div button:nth-child(2) {
+  @apply bg-green-600;
+}
+
+.bodyComposer {
+  @apply flex flex-row;
+}
+
+.editor {
+  @apply flex-1;
+}
+
+.editor textarea {
+  @apply w-full h-96 border-0 border-r-2 resize-none text-black p-3;
+}
+
+.preview {
+  @apply flex-1 p-3 font-open-sans;
+}
+
+/* Fix style for markdown */
+.preview h1 {
+  @apply text-2xl font-bold;
+}
+
+.preview ul {
+  @apply list-disc ml-3;
+}
+
+.preview ol {
+  @apply list-decimal;
+}
