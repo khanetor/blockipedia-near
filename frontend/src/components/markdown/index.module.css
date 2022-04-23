@@ -1,0 +1,16 @@
+.markdownStyle {
+  @apply p-3 font-open-sans;
+}
+
+/* Fix style for markdown */
+.markdownStyle h1 {
+  @apply text-2xl font-bold;
+}
+
+.markdownStyle ul {
+  @apply list-disc ml-3;
+}
+
+.markdownStyle ol {
+  @apply list-decimal;
+}
