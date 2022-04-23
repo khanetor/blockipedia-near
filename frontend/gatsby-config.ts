@@ -21,7 +21,19 @@ const config: GatsbyConfig = {
         "path": "./src/images/"
       },
       __key: "images"
-    }]
+    },
+    {
+      resolve: `gatsby-plugin-manifest`,
+      options: {
+        name: `Blockipedia`,
+        short_name: `B`,
+        start_url: `/`,
+        background_color: `#f7f0eb`,
+        theme_color: `#a2466c`,
+        display: `standalone`,
+        icon: `src/images/favicon.png`
+      },
+    },]
 };
 
 export default config;
