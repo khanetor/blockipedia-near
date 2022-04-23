@@ -1,0 +1,27 @@
+.readingView {
+  @apply mx-44 my-10;
+}
+
+.headerSection {
+  @apply font-light text-sm flex flex-row justify-between;
+}
+
+.headerInfo {
+  @apply flex flex-row items-center gap-4;
+}
+
+.headerRating {
+  @apply flex flex-row items-center ml-3;
+}
+
+.headerAction button {
+    @apply text-white bg-green-700 text-lg font-semibold p-3 rounded-2xl;
+}
+
+.titleSection {
+  @apply font-light text-4xl font-francois-one my-5;
+}
+
+.contentSection {
+  @apply font-open-sans;
+}
