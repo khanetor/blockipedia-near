@@ -1,6 +1,6 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
-use near_sdk::{env, near_bindgen, init, AccountId, Promise};
+use near_sdk::{env, init, near_bindgen, AccountId, Promise};
 
 mod models;
 use models::{Article, ArticleMeta, Rating, RatingAction, ONE_NEAR};
@@ -170,7 +170,6 @@ impl Wiki {
     // Upvote or download an article
     #[private]
     fn rate(&mut self, article_id: u64, action: RatingAction) {
-
         self.panic_on_nonexistent_article(article_id);
 
         let mut rating = self.ratings.get(&article_id).unwrap_or(Rating {
@@ -200,16 +199,27 @@ impl Wiki {
      */
     #[payable]
     pub fn donate(&mut self, article_id: u64) {
-
         self.panic_on_nonexistent_article(article_id);
 
         let donation_amt: u128 = env::attached_deposit();
 
         if donation_amt.lt(&MIN_DONATION_AMOUNT) {
-            env::panic(format!("Donation amount cannot be less than {:?}", MIN_DONATION_AMOUNT).as_bytes());
+            env::panic(
+                format!(
+                    "Donation amount cannot be less than {:?}",
+                    MIN_DONATION_AMOUNT
+                )
+                .as_bytes(),
+            );
         }
         if donation_amt.gt(&MAX_DONATION_AMOUNT) {
-            env::panic(format!("Donation amount cannot be greater than {:?}", MAX_DONATION_AMOUNT).as_bytes());
+            env::panic(
+                format!(
+                    "Donation amount cannot be greater than {:?}",
+                    MAX_DONATION_AMOUNT
+                )
+                .as_bytes(),
+            );
         }
 
         let meta = self.meta.get(&article_id).unwrap();
@@ -218,7 +228,6 @@ impl Wiki {
         // @TODO define the business logic where donation amount is split among the author and contributors
         let account_id: AccountId = author_id.parse().unwrap();
         Promise::new(account_id).transfer(donation_amt);
-
     }
 }
 
@@ -226,8 +235,8 @@ impl Wiki {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use near_sdk::{testing_env, MockedBlockchain, VMContext};
     use near_sdk::test_utils::get_created_receipts;
+    use near_sdk::{testing_env, MockedBlockchain, VMContext};
 
     fn get_context(input: Vec<u8>, is_view: bool, deposit: u128) -> VMContext {
         // see more at https://docs.rs/near-sdk/latest/near_sdk/struct.VMContext.html
