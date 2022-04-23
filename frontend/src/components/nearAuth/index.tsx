@@ -46,11 +46,15 @@ export function WalletProvider(props: { children: ReactNode }) {
     }
 }
 
-export function NEARAuth(props: { children: ReactNode }) {
+export function NEARAuthRoute(props: { children: ReactNode }) {
+    return <NEARAuth redirect>{props.children}</NEARAuth>
+}
+
+export function NEARAuth(props: { children: ReactNode, redirect: boolean }) {
     const wallet = useWallet()
 
     useEffect(function () {
-        if (!wallet!.authenticated) {
+        if (props.redirect && !wallet!.authenticated) {
             navigate("/")
         }
     }, [])
@@ -58,6 +62,9 @@ export function NEARAuth(props: { children: ReactNode }) {
     if (wallet?.authenticated) {
         return <>{props.children}</>
     } else {
-        return <></>
+        return <div className="flex flex-col items-center justify-center h-72 gap-7">
+            <div className="font-open-sans text-xl font-semibold">Please sign-in with your NEAR wallet to get started.</div>
+            <button className="bg-green-700 text-white p-4 rounded-2xl" onClick={wallet?.login}>Sign-in</button>
+        </div>
     }
 }
