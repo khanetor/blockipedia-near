@@ -73,7 +73,6 @@ impl Wiki {
         }
     }
 
-    #[private]
     fn panic_on_nonexistent_article(&self, article_id: u64) {
         let meta = self.meta.get(&article_id);
         if meta.is_none() {
@@ -168,7 +167,6 @@ impl Wiki {
     }
 
     // Upvote or download an article
-    #[private]
     fn rate(&mut self, article_id: u64, action: RatingAction) {
         self.panic_on_nonexistent_article(article_id);
 
