@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { NEARAuth } from "../../components/nearAuth"
+import { NEARAuthRoute } from "../../components/nearAuth"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
@@ -54,7 +54,7 @@ export default function ArticleReadingView(props: { id: number }) {
     }, [])
 
     if (article !== undefined) {
-        return <NEARAuth>
+        return <NEARAuthRoute>
             <Helmet>
                 <title>Blockipedia: {article.title}</title>
             </Helmet>
@@ -97,15 +97,15 @@ export default function ArticleReadingView(props: { id: number }) {
             </article>
 
             <DonationModal show={showDonation} articleId={article.id} dismiss={setShowDonation.bind(null, false)}></DonationModal>
-        </NEARAuth>
+        </NEARAuthRoute>
     } else {
-        return <NEARAuth>
+        return <NEARAuthRoute>
             <Helmet>
                 <title>Blockipedia: Loading...</title>
             </Helmet>
             <article className={readingView}>
                 Loading article ...
             </article>
-        </NEARAuth>
+        </NEARAuthRoute>
     }
 }
