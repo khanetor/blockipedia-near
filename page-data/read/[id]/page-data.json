@@ -1,0 +1,6 @@
+{
+    "componentChunkName": "component---src-pages-read-[id]-tsx",
+    "path": "/read/[id]/",
+    "result": {"pageContext":{}},
+    "staticQueryHashes": [],
+    "matchPath": "/read/:id"}
