@@ -19,7 +19,7 @@ function HeadNav() {
         <Link className={branding} to="/">Blockipedia</Link>
         <div className={links}>
             <Link className={link} to="/story">Our story</Link>
-            <Link className={link} to="/create">Write</Link>
+            <Link className={link} to="/write">Write</Link>
             {wallet!.authenticated ?
                 <a className={link} onClick={wallet!.logout}>Sign-out</a> :
                 <a className={link} onClick={wallet!.login}>Sign-in</a>}
