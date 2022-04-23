@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { NEARAuth } from "../../components/nearAuth"
+import { NEARAuthRoute } from "../../components/nearAuth"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
@@ -22,7 +22,7 @@ export default function () {
 
     const render = content.length > 0 ? content : "Preview"
 
-    return <NEARAuth>
+    return <NEARAuthRoute>
         <Helmet>
             <title>Blockipedia: {title}</title>
         </Helmet>
@@ -45,5 +45,5 @@ export default function () {
                 </div>
             </div>
         </div>
-    </NEARAuth>
+    </NEARAuthRoute>
 }
