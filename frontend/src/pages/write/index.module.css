@@ -3,7 +3,7 @@
 }
 
 .heading {
-  @apply flex flex-row h-14;
+  @apply flex flex-row h-14 gap-2;
 }
 
 .heading input {
