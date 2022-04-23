@@ -7,6 +7,9 @@ import { DonationModal } from "../../components/donation"
 import { contentSection, headerAction, headerInfo, headerRating, headerSection, readingView, titleSection } from "./[id].module.css"
 import { Helmet } from "react-helmet"
 
+import ArrowUp from "../../assets/svg/arrow-up.svg"
+import ArrowDown from "../../assets/svg/arrow-down.svg"
+
 type ArticleDetail = {
     id: number,
     title: string,
@@ -66,19 +69,9 @@ export default function ArticleReadingView(props: { id: number }) {
                             <div>{article.publishedDate.toDateString()}</div>
                         </div>
                         <div className={headerRating} >
-                            <button onClick={vote.bind(null, VoteAction.UP)}>
-                                <svg width="30px" height="30px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="48" height="48" fill="white" fill-opacity="0.01" />
-                                    <path d="M13 30L25 18L37 30" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
+                            <button onClick={vote.bind(null, VoteAction.UP)}><ArrowUp /></button>
                             {upvote}
-                            <button onClick={vote.bind(null, VoteAction.DOWN)}>
-                                <svg width="30px" height="30px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="48" height="48" fill="white" fill-opacity="0.01" />
-                                    <path d="M37 18L25 30L13 18" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
+                            <button onClick={vote.bind(null, VoteAction.DOWN)}><ArrowDown /></button>
                             {downvote}
                         </div>
                     </div>
