@@ -33,3 +33,7 @@
 .markdownStyle ol {
   @apply list-decimal ml-4;
 }
+
+.markdownStyle blockquote {
+  @apply my-3 py-2 pl-6 border-l-4 bg-slate-200 bg-opacity-50;
+}
