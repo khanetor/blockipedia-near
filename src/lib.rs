@@ -58,19 +58,19 @@ impl Wiki {
         let content = self
             .corpus
             .get(&article_id)
-            .unwrap_or(String::from("Content not available"));
+            .unwrap_or_else(|| String::from("Content not available"));
 
-        let rating = self.ratings.get(&article_id).unwrap_or(Rating::default());
+        let rating = self.ratings.get(&article_id).unwrap_or_default();
 
-        return Article {
+        Article {
             id: article_id,
             title: meta.title,
-            content: content,
+            content,
             author: meta.author,
             published_date: meta.published_date,
             upvote: rating.upvote,
             downvote: rating.downvote,
-        };
+        }
     }
 
     #[private]
@@ -83,13 +83,11 @@ impl Wiki {
 
     // Get a list of articles
     pub fn get_articles(&self) -> Vec<(u64, ArticleMeta)> {
-
         #[cfg(test)]
         println!("\ninvoking `get_articles`...");
 
         let mut articles = self.meta.to_vec();
         articles.retain(|rec| {
-
             let (id, _) = rec;
             let ratings = self.ratings.get(id).unwrap_or(Rating {
                 upvote: 0,
@@ -99,21 +97,26 @@ impl Wiki {
             let mut downs = ratings.downvote;
 
             // prevent the "division by 0" case
-            if downs == 0 { ups += 1; downs += 1; }
+            if downs == 0 {
+                ups += 1;
+                downs += 1;
+            }
 
             let ratio: f32 = ups as f32 / downs as f32;
 
             #[cfg(test)]
-            println!("record {:?}: up {:?}, down {:?}, ratio {:.2}, threshold {:.2}", id, ups, downs, ratio, ARTICLE_VISIBILITY_VOTING_RATIO);
+            println!(
+                "record {:?}: up {:?}, down {:?}, ratio {:.2}, threshold {:.2}",
+                id, ups, downs, ratio, ARTICLE_VISIBILITY_VOTING_RATIO
+            );
 
-            return ratio.gt(&ARTICLE_VISIBILITY_VOTING_RATIO);
-
+            ratio.gt(&ARTICLE_VISIBILITY_VOTING_RATIO)
         });
 
         #[cfg(test)]
         println!("done invoking `get_articles`\n");
 
-        return articles;
+        articles
     }
 
     // Create a new article for 2 NEARs
@@ -132,16 +135,16 @@ impl Wiki {
         let article_id = self.corpus.len();
 
         let meta = ArticleMeta {
-            title: title,
-            author: author,
+            title,
+            author,
             editors: vec![editor],
-            published_date: published_date,
+            published_date,
         };
 
         self.meta.insert(&article_id, &meta);
         self.corpus.insert(&article_id, &content);
 
-        return article_id;
+        article_id
     }
 
     // Edit an existing article for 0.5 NEARs
@@ -160,9 +163,7 @@ impl Wiki {
                 self.corpus.insert(&article_id, &content);
                 self.meta.insert(&article_id, &meta);
             }
-            None => {
-                env::panic(ERR_ARTICLE_NOT_FOUND.as_bytes())
-            }
+            None => env::panic(ERR_ARTICLE_NOT_FOUND.as_bytes()),
         }
     }
 
@@ -309,7 +310,11 @@ mod tests {
             String::from("This is a content of the test article 1."),
         );
         articles = contract.get_articles();
-        assert_eq!(articles.len(), 1, "Number of articles must be 1 after creating one article");
+        assert_eq!(
+            articles.len(),
+            1,
+            "Number of articles must be 1 after creating one article"
+        );
 
         contract.create_article(
             String::from("Test article 2"),
@@ -320,7 +325,11 @@ mod tests {
             String::from("This is a content of the test article 3."),
         );
         articles = contract.get_articles();
-        assert_eq!(articles.len(), 3, "Number of articles must be 3 after creating three articles");
+        assert_eq!(
+            articles.len(),
+            3,
+            "Number of articles must be 3 after creating three articles"
+        );
 
         dbg!(articles.len(), articles);
 
@@ -328,18 +337,25 @@ mod tests {
         // should return only articles with the desired upvote/downvote ratio
 
         // 3 upvotes
-        for _ in 0..3 { contract.upvote(1); }
+        for _ in 0..3 {
+            contract.upvote(1);
+        }
 
         // 7 downvotes
-        for _ in 0..7 { contract.downvote(1); }
+        for _ in 0..7 {
+            contract.downvote(1);
+        }
 
         articles = contract.get_articles();
-        assert_eq!(articles.len(), 2, "Number of articles must be 2 after 1 article is downvoted too much");
+        assert_eq!(
+            articles.len(),
+            2,
+            "Number of articles must be 2 after 1 article is downvoted too much"
+        );
 
         contract.upvote(1);
         articles = contract.get_articles();
         assert_eq!(articles.len(), 3, "Number of articles must be 3 again after the hidden article achieves the desirable voting ratio");
-
     }
 
     #[test]
@@ -369,7 +385,10 @@ mod tests {
 
         let article = contract.get_article(id);
 
-        assert_eq!(article.content, String::from("This is the updated content."));
+        assert_eq!(
+            article.content,
+            String::from("This is the updated content.")
+        );
     }
 
     #[test]
