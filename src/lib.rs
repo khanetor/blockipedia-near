@@ -1,9 +1,12 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
-use near_sdk::{env, near_bindgen};
+use near_sdk::{env, near_bindgen, init, AccountId, Promise};
 
 mod models;
 use models::{Article, ArticleMeta, Rating, RatingAction, ONE_NEAR};
+
+#[cfg(test)]
+use models::ParsedReceipt;
 
 mod constants;
 use constants::ERR_ARTICLE_NOT_FOUND;
@@ -12,8 +15,8 @@ use constants::ERR_ARTICLE_NOT_FOUND;
 const ARTICLE_VISIBILITY_VOTING_RATIO: f32 = 3.0 / 7.0;
 
 // sane constraints for donation amount
-const MIN_DONATION_AMOUNT: f32 = 1.0;
-const MAX_DONATION_AMOUNT: f32 = 100.0;
+const MIN_DONATION_AMOUNT: u128 = 1_000_000_000_000_000_000_000_000; // 1 $NEAR in yoctoNEAR
+const MAX_DONATION_AMOUNT: u128 = 100_000_000_000_000_000_000_000_000; // 100 $NEAR in yoctoNEAR
 
 near_sdk::setup_alloc!();
 
@@ -26,6 +29,7 @@ pub struct Wiki {
 }
 
 impl Default for Wiki {
+    #[init]
     fn default() -> Self {
         Self {
             meta: UnorderedMap::new(b"meta".to_vec()),
@@ -69,6 +73,7 @@ impl Wiki {
         };
     }
 
+    #[private]
     fn panic_on_nonexistent_article(&self, article_id: u64) {
         let meta = self.meta.get(&article_id);
         if meta.is_none() {
@@ -162,6 +167,7 @@ impl Wiki {
     }
 
     // Upvote or download an article
+    #[private]
     fn rate(&mut self, article_id: u64, action: RatingAction) {
 
         self.panic_on_nonexistent_article(article_id);
@@ -186,11 +192,17 @@ impl Wiki {
         self.rate(article_id, RatingAction::Downvote)
     }
 
-    // Donate to an article
+    /*
+     * Donate to an article
+     * @TODO determine the better practice between explicitly setting `donation_amt`
+     * as a contract method argument, and implicitly deriving it from `env::attached_deposit()`
+     */
     #[payable]
-    pub fn donate(&mut self, article_id: u64, donation_amt: f32) {
+    pub fn donate(&mut self, article_id: u64) {
 
         self.panic_on_nonexistent_article(article_id);
+
+        let donation_amt: u128 = env::attached_deposit();
 
         if donation_amt.lt(&MIN_DONATION_AMOUNT) {
             env::panic(format!("Donation amount cannot be less than {:?}", MIN_DONATION_AMOUNT).as_bytes());
@@ -199,7 +211,12 @@ impl Wiki {
             env::panic(format!("Donation amount cannot be greater than {:?}", MAX_DONATION_AMOUNT).as_bytes());
         }
 
+        let meta = self.meta.get(&article_id).unwrap();
+        let author_id = meta.author;
+
         // @TODO define the business logic where donation amount is split among the author and contributors
+        let account_id: AccountId = author_id.parse().unwrap();
+        Promise::new(account_id).transfer(donation_amt);
 
     }
 }
@@ -209,13 +226,15 @@ impl Wiki {
 mod tests {
     use super::*;
     use near_sdk::{testing_env, MockedBlockchain, VMContext};
+    use near_sdk::test_utils::get_created_receipts;
 
     fn get_context(input: Vec<u8>, is_view: bool, deposit: u128) -> VMContext {
+        // see more at https://docs.rs/near-sdk/latest/near_sdk/struct.VMContext.html
         VMContext {
-            current_account_id: "alice.testnet".to_string(),
-            signer_account_id: "robert.testnet".to_string(),
+            current_account_id: "blockipedia.localnet".to_string(),
+            signer_account_id: "user.localnet".to_string(),
             signer_account_pk: vec![0, 1, 2],
-            predecessor_account_id: "jane.testnet".to_string(),
+            predecessor_account_id: "user.localnet".to_string(),
             input,
             block_index: 0,
             block_timestamp: 0,
@@ -270,7 +289,7 @@ mod tests {
             env::block_timestamp(),
             "Incorrect published date"
         );
-        assert_eq!(article1.author, "robert.testnet", "Incorrect author");
+        assert_eq!(article1.author, "user.localnet", "Incorrect author");
     }
 
     #[test]
@@ -367,7 +386,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "Article not found")]
     fn panic_on_nonexistent_article() {
-        let context = get_context(vec![], false, 0);
+        let context = get_context(vec![], true, 0);
         testing_env!(context);
         let contract = Wiki::default();
         contract.panic_on_nonexistent_article(0);
@@ -387,7 +406,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "Article not found")]
     fn do_upvote_on_nonexistent_article() {
-        let context = get_context(vec![], false, 0);
+        let context = get_context(vec![], true, 0);
         testing_env!(context);
         let mut contract = Wiki::default();
         contract.upvote(0);
@@ -396,7 +415,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "Article not found")]
     fn do_downvote_on_nonexistent_article() {
-        let context = get_context(vec![], false, 0);
+        let context = get_context(vec![], true, 0);
         testing_env!(context);
         let mut contract = Wiki::default();
         contract.downvote(0);
@@ -430,7 +449,7 @@ mod tests {
         let context = get_context(vec![], false, ONE_NEAR * 2);
         testing_env!(context);
         let mut contract = Wiki::default();
-        contract.donate(0, 1.0);
+        contract.donate(0);
     }
 
     #[test]
@@ -440,7 +459,10 @@ mod tests {
         testing_env!(context);
         let mut contract = Wiki::default();
         let id = contract.create_article(String::from("Title"), String::from("Content"));
-        contract.donate(id, 0.0);
+
+        let context = get_context(vec![], false, 999_000_000_000_000_000_000_000); // 0.999 $NEAR
+        testing_env!(context);
+        contract.donate(id);
     }
 
     #[test]
@@ -450,6 +472,33 @@ mod tests {
         testing_env!(context);
         let mut contract = Wiki::default();
         let id = contract.create_article(String::from("Title"), String::from("Content"));
-        contract.donate(id, 100.01);
+
+        let context = get_context(vec![], false, 100_010_000_000_000_000_000_000_000); // 100.01 $NEAR
+        testing_env!(context);
+        contract.donate(id);
+    }
+
+    #[test]
+    fn donate_successfully_to_article() {
+        let context = get_context(vec![], false, ONE_NEAR * 2);
+        testing_env!(context);
+        let mut contract = Wiki::default();
+        let id = contract.create_article(String::from("Title"), String::from("Content"));
+
+        let context = get_context(vec![], false, ONE_NEAR * 3 / 2);
+        testing_env!(context);
+        contract.donate(id);
+
+        let mut receipts = get_created_receipts();
+        receipts.retain(|r| {
+            let raw_receipt = serde_json::value::to_raw_value(&r).unwrap();
+            let raw_receipt_str = raw_receipt.get();
+            let parsed_receipt: Result<ParsedReceipt, _> = serde_json::from_str(raw_receipt_str);
+            dbg!(&parsed_receipt);
+            let obj = parsed_receipt.unwrap();
+            return obj.receiver_id == "user.localnet"
+                && obj.actions[0].Transfer.deposit == ONE_NEAR * 3 / 2;
+        });
+        assert_eq!(receipts.len(), 1);
     }
 }

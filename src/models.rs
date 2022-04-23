@@ -34,3 +34,26 @@ pub enum RatingAction {
     Upvote,
     Downvote,
 }
+
+#[cfg(test)]
+#[cfg_attr(test, derive(Debug))]
+#[derive(Serialize, Deserialize)]
+pub struct ParsedReceiptTransfer {
+    pub deposit: u128,
+}
+
+#[cfg(test)]
+#[cfg_attr(test, derive(Debug))]
+#[derive(Serialize, Deserialize)]
+#[allow(non_snake_case)]
+pub struct ParsedReceiptAction {
+    pub Transfer: ParsedReceiptTransfer,
+}
+
+#[cfg(test)]
+#[cfg_attr(test, derive(Debug))]
+#[derive(Serialize, Deserialize)]
+pub struct ParsedReceipt<'a> {
+    pub receiver_id: &'a str,
+    pub actions: Vec<ParsedReceiptAction>,
+}
