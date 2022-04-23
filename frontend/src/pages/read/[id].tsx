@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react"
 import { NEARAuthRoute } from "../../components/nearAuth"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
 
 import { DonationModal } from "../../components/donation"
-import { contentSection, headerAction, headerInfo, headerRating, headerSection, readingView, titleSection } from "./[id].module.css"
+import { headerAction, headerInfo, headerRating, headerSection, readingView, titleSection } from "./[id].module.css"
 import { Helmet } from "react-helmet"
+import { MarkdownRenderer } from "../../components/markdown"
 
 type ArticleDetail = {
     id: number,
@@ -89,10 +88,10 @@ export default function ArticleReadingView(props: { id: number }) {
                 <div className={titleSection}>
                     {article.title}
                 </div>
-                <div className={contentSection}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <div>
+                    <MarkdownRenderer>
                         {article.content}
-                    </ReactMarkdown>
+                    </MarkdownRenderer>
                 </div>
             </article>
 

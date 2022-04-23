@@ -1,5 +1,5 @@
 .markdownStyle {
-  @apply p-3 font-open-sans;
+  @apply font-open-sans;
 }
 
 .markdownStyle h1 {
