@@ -1,9 +1,9 @@
 .composer {
-  @apply mx-32;
+  @apply mx-32 mt-4;
 }
 
 .heading {
-  @apply flex flex-row h-14;
+  @apply flex flex-row h-14 gap-2;
 }
 
 .heading input {
@@ -39,18 +39,5 @@
 }
 
 .preview {
-  @apply flex-1 p-3 font-open-sans;
-}
-
-/* Fix style for markdown */
-.preview h1 {
-  @apply text-2xl font-bold;
-}
-
-.preview ul {
-  @apply list-disc ml-3;
-}
-
-.preview ol {
-  @apply list-decimal;
+  @apply flex-1 p-3;
 }

@@ -1,0 +1,39 @@
+.markdownStyle {
+  @apply font-open-sans;
+}
+
+.markdownStyle h1 {
+  @apply text-6xl font-bold;
+}
+
+.markdownStyle h2 {
+  @apply text-5xl font-bold;
+}
+
+.markdownStyle h3 {
+  @apply text-4xl font-bold;
+}
+
+.markdownStyle h4 {
+  @apply text-3xl font-bold;
+}
+
+.markdownStyle h5 {
+  @apply text-2xl font-bold;
+}
+
+.markdownStyle h6 {
+  @apply text-xl font-bold;
+}
+
+.markdownStyle ul {
+  @apply list-disc ml-4;
+}
+
+.markdownStyle ol {
+  @apply list-decimal ml-4;
+}
+
+.markdownStyle blockquote {
+  @apply my-3 py-2 pl-6 border-l-4 bg-slate-200 bg-opacity-50;
+}

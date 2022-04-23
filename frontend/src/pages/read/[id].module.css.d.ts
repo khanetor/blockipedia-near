@@ -5,7 +5,6 @@ declare const styles: {
   readonly "headerRating": string;
   readonly "headerAction": string;
   readonly "titleSection": string;
-  readonly "contentSection": string;
 };
 export = styles;
 
