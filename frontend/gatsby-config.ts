@@ -8,12 +8,12 @@ const config: GatsbyConfig = {
   pathPrefix: "/blockipedia-near",
   plugins: [
     "gatsby-plugin-postcss",
-    "gatsby-plugin-image",
     "gatsby-plugin-react-helmet",
-    "gatsby-plugin-sitemap",
+    "gatsby-plugin-image",
     "gatsby-plugin-sharp",
     "gatsby-transformer-sharp",
     "gatsby-plugin-layout",
+    "gatsby-plugin-sitemap",
     {
       resolve: 'gatsby-source-filesystem',
       options: {
@@ -21,6 +21,14 @@ const config: GatsbyConfig = {
         "path": "./src/images/"
       },
       __key: "images"
+    },
+    {
+      resolve: "gatsby-plugin-react-svg",
+      options: {
+        rule: {
+          include: /assets\/svg/ // See below to configure properly
+        }
+      }
     }]
 };
 
