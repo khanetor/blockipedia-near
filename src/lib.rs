@@ -8,15 +8,18 @@ use models::{Article, ArticleMeta, Rating, RatingAction, ONE_NEAR};
 #[cfg(test)]
 use models::ParsedReceipt;
 
+mod utils;
+use utils::f32_to_ynear;
+
 mod constants;
 use constants::ERR_ARTICLE_NOT_FOUND;
 
 // the upvote/downvote ratio, below which the article is hidden away (#12)
-const ARTICLE_VISIBILITY_VOTING_RATIO: f32 = 3.0 / 7.0;
+const ARTICLE_VISIBILITY_VOTING_RATIO: f64 = 3.0 / 7.0;
 
 // sane constraints for donation amount
-const MIN_DONATION_AMOUNT: u128 = 1_000_000_000_000_000_000_000_000; // 1 $NEAR in yoctoNEAR
-const MAX_DONATION_AMOUNT: u128 = 100_000_000_000_000_000_000_000_000; // 100 $NEAR in yoctoNEAR
+const MIN_DONATION_AMOUNT: u128 = f32_to_ynear(1.0); // 1 $NEAR in yoctoNEAR
+const MAX_DONATION_AMOUNT: u128 = f32_to_ynear(100.0); // 100 $NEAR in yoctoNEAR
 
 near_sdk::setup_alloc!();
 
@@ -101,7 +104,7 @@ impl Wiki {
                 downs += 1;
             }
 
-            let ratio: f32 = ups as f32 / downs as f32;
+            let ratio: f64 = ups as f64 / downs as f64;
 
             #[cfg(test)]
             println!(
