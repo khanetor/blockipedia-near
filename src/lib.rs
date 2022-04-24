@@ -199,7 +199,7 @@ impl Wiki {
      * as a contract method argument, and implicitly deriving it from `env::attached_deposit()`
      */
     #[payable]
-    pub fn donate(&mut self, article_id: u64) {
+    pub fn donate(&mut self, article_id: u64) -> Promise {
         self.panic_on_nonexistent_article(article_id);
 
         let donation_amt: u128 = env::attached_deposit();
@@ -226,9 +226,10 @@ impl Wiki {
         let meta = self.meta.get(&article_id).unwrap();
         let author_id = meta.author;
 
-        // @TODO define the business logic where donation amount is split among the author and contributors
+        // @TODO define the business logic where donation amount is split among the author and
+        // contributors; see discussion https://github.com/nlhkh/blockipedia-near/discussions/39
         let account_id: AccountId = author_id.parse().unwrap();
-        Promise::new(account_id).transfer(donation_amt);
+        return Promise::new(account_id).transfer(donation_amt);
     }
 }
 
