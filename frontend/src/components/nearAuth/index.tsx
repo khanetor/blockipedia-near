@@ -1,5 +1,6 @@
 import { WalletConnection } from "near-api-js"
 import { navigate } from "gatsby"
+import { StaticImage } from "gatsby-plugin-image"
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
 import { getNearWallet, signIn, signOut } from "../../near-wallet"
 
@@ -62,7 +63,8 @@ export function NEARAuth(props: { children: ReactNode, redirect: boolean }) {
     if (wallet?.authenticated) {
         return <>{props.children}</>
     } else {
-        return <div className="flex flex-col items-center justify-center h-72 gap-7">
+        return <div className="flex flex-col items-center justify-center h-72 gap-6 pt-6">
+            <StaticImage src="../../images/logo.png" alt="logo" width={300} height={300}></StaticImage>
             <div className="font-open-sans text-xl font-semibold">Please sign-in with your NEAR wallet to get started.</div>
             <button className="bg-green-700 text-white p-4 rounded-2xl" onClick={wallet?.login}>Sign-in</button>
         </div>

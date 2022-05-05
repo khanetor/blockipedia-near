@@ -21,7 +21,3 @@
 .titleSection {
   @apply font-light text-4xl font-francois-one my-5;
 }
-
-.contentSection {
-  @apply font-open-sans;
-}
