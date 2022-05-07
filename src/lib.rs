@@ -229,7 +229,7 @@ impl Wiki {
         // @TODO define the business logic where donation amount is split among the author and
         // contributors; see discussion https://github.com/nlhkh/blockipedia-near/discussions/39
         let account_id: AccountId = author_id.parse().unwrap();
-        return Promise::new(account_id).transfer(donation_amt);
+        Promise::new(account_id).transfer(donation_amt)
     }
 }
 
