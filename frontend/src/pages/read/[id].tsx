@@ -90,7 +90,11 @@ export default function (props: { id: string }) {
                 </div>
             </article>
 
-            <DonationModal show={showDonation} articleId={article.id} dismiss={setShowDonation.bind(null, false)}></DonationModal>
+            <DonationModal
+                show={showDonation}
+                articleId={article.id}
+                dismiss={setShowDonation.bind(null, false)}
+                donate={contract!.donate}></DonationModal>
         </NEARAuthRoute>
     } else {
         return <NEARAuthRoute>

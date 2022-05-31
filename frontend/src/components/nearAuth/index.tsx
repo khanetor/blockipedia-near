@@ -1,4 +1,4 @@
-import { WalletConnection, Contract } from "near-api-js"
+import { WalletConnection, Contract, utils as NEARUtils } from "near-api-js"
 import { navigate } from "gatsby"
 import { StaticImage } from "gatsby-plugin-image"
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
@@ -12,6 +12,7 @@ type ISmartContract = {
     getArticles: () => Promise<ArticleMeta[]>
     getArticle: (id: number) => Promise<CArticle>
     createArticle: (title: string, content: string) => Promise<void>
+    donate: (articleId: number, amount: number) => Promise<void>
 }
 
 const ContractContext = createContext<ISmartContract | undefined>(undefined)
@@ -43,12 +44,12 @@ export function ContractProvider(props: { children: ReactNode }) {
         async function login() {
             await signIn(wallet!)
         }
-    
+
         function logout() {
             signOut(wallet!)
             setAuthenticated(wallet!.isSignedIn())
         }
-    
+
         async function getArticles(): Promise<ArticleMeta[]> {
             return await contract!.get_articles()
         }
@@ -58,9 +59,9 @@ export function ContractProvider(props: { children: ReactNode }) {
                 article_id: id
             })
         }
-    
+
         async function createArticle(title: string, content: string): Promise<void> {
-            const {protocol, hostname} = window.location
+            const { protocol, hostname } = window.location
             await contract!.create_article({
                 callbackUrl: `${protocol}//${hostname}`,
                 meta: "Article created",
@@ -68,11 +69,24 @@ export function ContractProvider(props: { children: ReactNode }) {
                     title, content
                 },
                 gas: "300000000000000",
-                amount: "2000000000000000000000000"
+                amount: NEARUtils.format.parseNearAmount("2")!
             })
         }
 
-        const smartContract: ISmartContract = { authenticated, login, logout, getArticles, getArticle, createArticle }
+        async function donate(articleId: number, amount: number): Promise<void> {
+            const { protocol, hostname } = window.location
+            await contract!.donate({
+                callbackUrl: `${protocol}//${hostname}/read/${articleId}`,
+                meta: "Article donated",
+                args: {
+                    article_id: articleId
+                },
+                gas: "300000000000000",
+                amount: NEARUtils.format.parseNearAmount(amount.toString())!
+            })
+        }
+
+        const smartContract: ISmartContract = { authenticated, login, logout, getArticles, getArticle, createArticle, donate }
         return <ContractContext.Provider value={smartContract}>
             {props.children}
         </ContractContext.Provider>
