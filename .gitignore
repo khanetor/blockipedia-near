@@ -20,3 +20,6 @@ Cargo.lock
 # NEAR dev account
 neardev/dev-account.env
 neardev/dev-account
+
+# IDE
+/.vscode/*.log

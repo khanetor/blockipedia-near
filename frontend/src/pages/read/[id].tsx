@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { NEARAuthRoute } from "../../components/nearAuth"
+import { NEARAuthRoute, useContract } from "../../components/nearAuth"
 
 import { DonationModal } from "../../components/donation"
 import { headerAction, headerInfo, headerRating, headerSection, readingView, titleSection } from "./[id].module.css"
@@ -21,12 +21,15 @@ enum VoteAction {
     UP, DOWN
 }
 
-export default function ArticleReadingView(props: { id: number }) {
+export default function (props: { id: string }) {
+    const _id = parseInt(props.id)
     const [article, setArticle] = useState<ArticleDetail | undefined>(undefined)
     const [upvote, setUpvote] = useState<number>(1000)
     const [downvote, setDownvote] = useState<number>(1000)
 
     const [showDonation, setShowDonation] = useState(false)
+
+    const contract = useContract()
 
     function vote(action: VoteAction) {
         switch (action) {
@@ -43,16 +46,15 @@ export default function ArticleReadingView(props: { id: number }) {
 
     useEffect(function () {
         // Fetch article from contract
-        setTimeout(function () {
-            const article: ArticleDetail = {
-                id: props.id,
-                title: `Article ${props.id}`,
-                content: "Helping Any of Us **Can Help Us All** Helping Any of Us Can Help Us All Helping Any of Us Can Help Us All Helping Any of Us Can Help Us All",
-                author: "mackenzie.near",
-                publishedDate: new Date()
-            }
-            setArticle(article)
-        }, 0)
+        contract?.getArticle(_id).then(article => {
+            setArticle({
+                id: article.id,
+                title: article.title,
+                content: article.content,
+                author: article.author,
+                publishedDate: new Date(article.published_date / 1000000)
+            })
+        })
     }, [])
 
     if (article !== undefined) {

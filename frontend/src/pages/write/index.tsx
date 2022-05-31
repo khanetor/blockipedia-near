@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { NEARAuthRoute } from "../../components/nearAuth"
+import { NEARAuthRoute, useContract } from "../../components/nearAuth"
 
 import { bodyComposer, composer, editor, preview, heading } from "./index.module.css"
 import { navigate } from "gatsby"
@@ -10,13 +10,14 @@ export default function () {
     const [title, setTitle] = useState<string>("")
     const [content, setContent] = useState<string>("")
 
+    const contract = useContract()
+
     function cancel() {
         navigate("/")
     }
 
     function publish() {
-        console.log("Should publish article with title:")
-        console.log(title)
+        contract?.createArticle(title, content)
     }
 
     const render: string = content.length > 0 ? content : "Preview"

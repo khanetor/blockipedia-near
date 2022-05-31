@@ -1,11 +1,11 @@
 import React, { ReactNode } from "react"
 import { Link, navigate } from "gatsby"
-import { WalletProvider, useWallet } from "../components/nearAuth"
+import { ContractProvider, useContract } from "../components/nearAuth"
 
 import { header, links, link, linkAction, branding } from "./index.module.css"
 
 function HeadNav() {
-    const wallet = useWallet()
+    const wallet = useContract()
 
     function getStarted() {
         if (wallet?.authenticated) {
@@ -29,10 +29,10 @@ function HeadNav() {
 }
 
 export default function (props: { children: ReactNode }) {
-    return <WalletProvider>
+    return <ContractProvider>
         <HeadNav />
         <div>
             {props.children}
         </div>
-    </WalletProvider>
+    </ContractProvider>
 }
