@@ -16,10 +16,16 @@ build:
 lint:
 	cargo clippy --fix
 
-deploy: build
+deploy-dev: build
 	near dev-deploy --wasmFile $(TARGET)
 
 clear-state:
 	rm -rf neardev
 
-redeploy: clear-state deploy
+redeploy: clear-state deploy-dev
+
+create-test-account:
+	near create-account test.blockpedia.testnet --masterAccount blockipedia.testnet
+
+deploy-test:
+	near deploy test.blockipedia.testnet --wasmFile $(TARGET)
