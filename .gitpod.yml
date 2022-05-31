@@ -6,3 +6,7 @@ tasks:
       rustup target add wasm32-unknown-unknown
       rustup component add clippy rustfmt
       npm install -g near-cli
+
+ports:
+  - port: 3000
+    visibility: public

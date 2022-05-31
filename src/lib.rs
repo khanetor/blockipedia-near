@@ -44,9 +44,11 @@ impl Default for Wiki {
 
 #[near_bindgen]
 impl Wiki {
+    #[private]
     pub fn reset(&mut self) {
         self.meta.clear();
         self.corpus.clear();
+        self.ratings.clear();
     }
 
     // Get an article
