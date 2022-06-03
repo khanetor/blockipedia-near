@@ -528,8 +528,8 @@ mod tests {
             let parsed_receipt: Result<ParsedReceipt, _> = serde_json::from_str(raw_receipt_str);
             dbg!(&parsed_receipt);
             let obj = parsed_receipt.unwrap();
-            return obj.receiver_id == "user.localnet"
-                && obj.actions[0].Transfer.deposit == ONE_NEAR * 3 / 2;
+            obj.receiver_id == "user.localnet"
+                && obj.actions[0].Transfer.deposit == ONE_NEAR * 3 / 2
         });
         assert_eq!(receipts.len(), 1);
     }
