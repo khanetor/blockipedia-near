@@ -17,6 +17,16 @@ type ISmartContract = {
 
 const ContractContext = createContext<ISmartContract | undefined>(undefined)
 
+function getHostname(): string {
+    const hostname = process.env.HOSTNAME
+    if (hostname) {
+        return hostname
+    } else {
+        const { protocol, hostname } = window.location
+        return `${protocol}//${hostname}`
+    }
+}
+
 export function useContract() {
     return useContext(ContractContext)
 }
@@ -61,9 +71,10 @@ export function ContractProvider(props: { children: ReactNode }) {
         }
 
         async function createArticle(title: string, content: string): Promise<void> {
-            const { protocol, hostname } = window.location
+            const hostname = getHostname()
+
             await contract!.create_article({
-                callbackUrl: `${protocol}//${hostname}`,
+                callbackUrl: `${hostname}`,
                 meta: "Article created",
                 args: {
                     title, content
@@ -74,9 +85,10 @@ export function ContractProvider(props: { children: ReactNode }) {
         }
 
         async function donate(articleId: number, amount: number): Promise<void> {
-            const { protocol, hostname } = window.location
+            const callbackUrl = `${getHostname()}/read/${articleId}`
+
             await contract!.donate({
-                callbackUrl: `${protocol}//${hostname}/read/${articleId}`,
+                callbackUrl: callbackUrl,
                 meta: "Article donated",
                 args: {
                     article_id: articleId
