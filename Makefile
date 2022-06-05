@@ -10,6 +10,9 @@ test:
 test-verbose:
 	cargo test $(TEST_TARGET) -- --nocapture
 
+add-target:
+	rustup target add wasm32-unknown-unknown
+
 build:
 	cargo build --target wasm32-unknown-unknown --release
 
@@ -29,3 +32,6 @@ create-test-account:
 
 deploy-test:
 	near deploy test.blockipedia.testnet --wasmFile $(TARGET)
+
+clean:
+	cargo clean
