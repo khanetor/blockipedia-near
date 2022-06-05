@@ -61,9 +61,8 @@ export function ContractProvider(props: { children: ReactNode }) {
         }
 
         async function createArticle(title: string, content: string): Promise<void> {
-            const { protocol, hostname } = window.location
             await contract!.create_article({
-                callbackUrl: `${protocol}//${hostname}`,
+                callbackUrl: `${process.env.HOSTNAME!}`,
                 meta: "Article created",
                 args: {
                     title, content
@@ -74,9 +73,10 @@ export function ContractProvider(props: { children: ReactNode }) {
         }
 
         async function donate(articleId: number, amount: number): Promise<void> {
-            const { protocol, hostname } = window.location
+            const callbackUrl = `${process.env.HOSTNAME!}/read/${articleId}`
+
             await contract!.donate({
-                callbackUrl: `${protocol}//${hostname}/read/${articleId}`,
+                callbackUrl: callbackUrl,
                 meta: "Article donated",
                 args: {
                     article_id: articleId
