@@ -3,6 +3,7 @@ use near_sdk::AccountId;
 
 pub static ONE_NEAR: u128 = 10u128.pow(24);
 
+// @TODO check if serde_json::Serialize is needed for the FE client to consume
 #[derive(BorshSerialize, BorshDeserialize)]
 pub struct Article {
     pub id: u64,
@@ -14,6 +15,7 @@ pub struct Article {
     pub downvote: u8,
 }
 
+// @TODO check if serde_json::Serialize is needed for the FE client to consume
 #[cfg_attr(test, derive(Debug))] // add Debug trait for this struct only when running tests
 #[derive(BorshSerialize, BorshDeserialize)]
 pub struct ArticleMeta {

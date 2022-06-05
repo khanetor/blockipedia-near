@@ -46,6 +46,7 @@ impl Wiki {
     }
 
     // Get an article
+    // @TODO check if serde_json::Serialize is needed for the FE client to consume
     #[result_serializer(borsh)] // see https://www.near-sdk.io/contract-interface/serialization-interface#overriding-serialization-protocol-default
     pub fn get_article(&self, article_id: u64) -> Article {
         let meta = self.meta.get(&article_id).unwrap_or(ArticleMeta {
@@ -81,6 +82,7 @@ impl Wiki {
     }
 
     // Get a list of articles
+    // @TODO check if serde_json::Serialize is needed for the FE client to consume
     #[result_serializer(borsh)] // see https://www.near-sdk.io/contract-interface/serialization-interface#overriding-serialization-protocol-default
     pub fn get_articles(&self) -> Vec<(u64, ArticleMeta)> {
         #[cfg(test)]
@@ -207,7 +209,8 @@ impl Wiki {
                 format!(
                     "Donation amount cannot be less than {:?}",
                     MIN_DONATION_AMOUNT
-                ).as_str(),
+                )
+                .as_str(),
             );
         }
         if donation_amt.gt(&MAX_DONATION_AMOUNT) {
@@ -215,7 +218,8 @@ impl Wiki {
                 format!(
                     "Donation amount cannot be greater than {:?}",
                     MAX_DONATION_AMOUNT
-                ).as_str(),
+                )
+                .as_str(),
             );
         }
 
@@ -521,7 +525,9 @@ mod tests {
         receipts.retain(|r| {
             dbg!(r);
             r.receiver_id == "user.localnet".parse().unwrap()
-                && r.actions.eq(&[near_sdk::mock::VmAction::Transfer { deposit: ONE_NEAR * 3 / 2 }])
+                && r.actions.eq(&[near_sdk::mock::VmAction::Transfer {
+                    deposit: ONE_NEAR * 3 / 2,
+                }])
         });
         assert_eq!(receipts.len(), 1);
     }
