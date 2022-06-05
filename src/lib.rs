@@ -46,8 +46,6 @@ impl Wiki {
     }
 
     // Get an article
-    // @TODO check if serde_json::Serialize is needed for the FE client to consume
-    #[result_serializer(borsh)] // see https://www.near-sdk.io/contract-interface/serialization-interface#overriding-serialization-protocol-default
     pub fn get_article(&self, article_id: u64) -> Article {
         let meta = self.meta.get(&article_id).unwrap_or(ArticleMeta {
             title: String::from("Not found"),
@@ -82,8 +80,6 @@ impl Wiki {
     }
 
     // Get a list of articles
-    // @TODO check if serde_json::Serialize is needed for the FE client to consume
-    #[result_serializer(borsh)] // see https://www.near-sdk.io/contract-interface/serialization-interface#overriding-serialization-protocol-default
     pub fn get_articles(&self) -> Vec<(u64, ArticleMeta)> {
         #[cfg(test)]
         println!("\ninvoking `get_articles`...");
