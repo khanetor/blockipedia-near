@@ -73,10 +73,8 @@ export function ContractProvider(props: { children: ReactNode }) {
         }
 
         async function donate(articleId: number, amount: number): Promise<void> {
-            const callbackUrl = `${process.env.HOSTNAME!}/read/${articleId}`
-
             await contract!.donate({
-                callbackUrl: callbackUrl,
+                callbackUrl: `${process.env.HOSTNAME!}/read/${articleId}`,
                 meta: "Article donated",
                 args: {
                     article_id: articleId
