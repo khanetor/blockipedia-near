@@ -1,0 +1,12 @@
+previewsEnabled: true
+previewsExpireAfterDays: 3
+services:
+- type: web
+  name: blockipedia
+  env: static
+  buildCommand: cd frontend; yarn; yarn build
+  staticPublishPath: ./frontend/public
+  envVars:
+  - key: GATSBY_CONTRACT_ADDRESS
+    value: test.blockipedia.testnet
+    previewValue: dev-1654392200283-45248039192531
