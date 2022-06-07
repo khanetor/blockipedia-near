@@ -4,6 +4,9 @@
   "private": true,
   "description": "blockipedia",
   "author": "Kha",
+  "contributors": [
+    "Khang Dinh <gate@dklab.co>"
+  ],
   "keywords": [
     "gatsby"
   ],

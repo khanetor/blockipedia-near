@@ -19,7 +19,7 @@ async function getNearWallet() {
 async function signIn(wallet: WalletConnection) {
     await wallet.requestSignIn(
         process.env.GATSBY_CONTRACT_ADDRESS,
-        process.env.APP_NAME
+        process.env.GATSBY_APP_NAME
     )
 }
 

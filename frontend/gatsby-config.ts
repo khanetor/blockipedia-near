@@ -9,9 +9,9 @@ import type { GatsbyConfig } from "gatsby";
 const config: GatsbyConfig = {
   siteMetadata: {
     title: `Blockipedia`,
-    siteUrl: `https://nlhkh.github.io/blockipedia-near`
+    siteUrl: process.env.GATSBY_SITE_URL || `https://nlhkh.github.io/blockipedia-near`
   },
-  pathPrefix: process.env.GATSBY_PATH_PREFIX || "/blockipedia-near",
+  pathPrefix: process.env.GATSBY_PATH_PREFIX, // e.g. `/blockipedia-near` when served by GitHub Pages
   plugins: [
     "gatsby-plugin-postcss",
     "gatsby-plugin-react-helmet",

@@ -18,7 +18,7 @@ type ISmartContract = {
 const ContractContext = createContext<ISmartContract | undefined>(undefined)
 
 function getHostname(): string {
-    const hostname = process.env.HOSTNAME
+    const hostname = process.env.GATSBY_HOSTNAME
     if (hostname) {
         return hostname
     } else {
