@@ -2,7 +2,7 @@ previewsEnabled: false # see https://render.com/docs/preview-environments
 previewsExpireAfterDays: 3
 services:
 - type: web
-  name: blockipedia-frontend
+  name: blockipedia
   env: static
   buildCommand: cd frontend; yarn; yarn build
   staticPublishPath: ./frontend/public
