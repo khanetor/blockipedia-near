@@ -1,6 +1,6 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::AccountId;
 use near_sdk::serde::Serialize;
+use near_sdk::AccountId;
 
 pub static ONE_NEAR: u128 = 10u128.pow(24);
 
