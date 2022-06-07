@@ -39,7 +39,7 @@ export function ContractProvider(props: { children: ReactNode }) {
     useEffect(function () {
         getNearWallet().then(w => {
             setAuthenticated(w.isSignedIn())
-            const c = new Contract(w.account(), process.env.CONTRACT_ADDRESS!, {
+            const c = new Contract(w.account(), process.env.GATSBY_CONTRACT_ADDRESS!, {
                 viewMethods: ["get_article", "get_articles"],
                 changeMethods: ["create_article", "update_article", "upvote", "downvote", "donate"]
             })

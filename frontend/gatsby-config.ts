@@ -1,3 +1,9 @@
+if (process.env.DOTENV_PATH) {
+  require("dotenv").config({
+    path: process.env.DOTENV_PATH,
+  })
+}
+
 import type { GatsbyConfig } from "gatsby";
 
 const config: GatsbyConfig = {
@@ -5,7 +11,7 @@ const config: GatsbyConfig = {
     title: `Blockipedia`,
     siteUrl: `https://nlhkh.github.io/blockipedia-near`
   },
-  pathPrefix: "/blockipedia-near",
+  pathPrefix: process.env.GATSBY_PATH_PREFIX || "/blockipedia-near",
   plugins: [
     "gatsby-plugin-postcss",
     "gatsby-plugin-react-helmet",
