@@ -2,6 +2,10 @@ if (process.env.DOTENV_PATH) {
   require("dotenv").config({
     path: process.env.DOTENV_PATH,
   })
+} else {
+  require("dotenv").config({
+    path: `.env.${process.env.NODE_ENV || 'development'}`,
+  })
 }
 
 import type { GatsbyConfig } from "gatsby";
