@@ -29,7 +29,7 @@ export function ContractProvider(props: { children: ReactNode }) {
     useEffect(function () {
         getNearWallet().then(w => {
             setAuthenticated(w.isSignedIn())
-            const c = new Contract(w.account(), process.env.CONTRACT_ADDRESS!, {
+            const c = new Contract(w.account(), process.env.GATSBY_CONTRACT_ADDRESS!, {
                 viewMethods: ["get_article", "get_articles"],
                 changeMethods: ["create_article", "update_article", "upvote", "downvote", "donate"]
             })
@@ -62,7 +62,7 @@ export function ContractProvider(props: { children: ReactNode }) {
 
         async function createArticle(title: string, content: string): Promise<void> {
             await contract!.create_article({
-                callbackUrl: `${process.env.HOSTNAME!}`,
+                callbackUrl: `${process.env.GATSBY_HOSTNAME!}${process.env.GATSBY_PATH_PREFIX!}`,
                 meta: "Article created",
                 args: {
                     title, content

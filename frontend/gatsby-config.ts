@@ -1,11 +1,21 @@
+if (process.env.DOTENV_PATH) {
+  require("dotenv").config({
+    path: process.env.DOTENV_PATH,
+  })
+} else {
+  require("dotenv").config({
+    path: `.env.${process.env.NODE_ENV || 'development'}`,
+  })
+}
+
 import type { GatsbyConfig } from "gatsby";
 
 const config: GatsbyConfig = {
   siteMetadata: {
-    title: `Blockipedia`,
-    siteUrl: `https://nlhkh.github.io/blockipedia-near`
+    title: process.env.GATSBY_APP_NAME,
+    siteUrl: `${process.env.GATSBY_HOSTNAME!}${process.env.GATSBY_PATH_PREFIX!}`
   },
-  pathPrefix: "/blockipedia-near",
+  pathPrefix: process.env.GATSBY_PATH_PREFIX, // e.g. `/blockipedia-near` when served by GitHub Pages
   plugins: [
     "gatsby-plugin-postcss",
     "gatsby-plugin-react-helmet",

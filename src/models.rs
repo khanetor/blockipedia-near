@@ -1,25 +1,31 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
+use near_sdk::serde::Serialize;
 use near_sdk::AccountId;
-use serde::{Deserialize, Serialize};
 
 pub static ONE_NEAR: u128 = 10u128.pow(24);
 
-#[derive(Serialize)]
+// see https://www.near-sdk.io/contract-interface/serialization-interface#overriding-serialization-protocol-default
+// see https://www.near-sdk.io/best-practices#reuse-crates-from-near-sdk
+#[derive(BorshSerialize, BorshDeserialize, Serialize)]
+#[serde(crate = "near_sdk::serde")]
 pub struct Article {
     pub id: u64,
     pub title: String,
     pub content: String,
-    pub author: AccountId,
+    pub author: String,
     pub published_date: u64,
     pub upvote: u8,
     pub downvote: u8,
 }
 
+// see https://www.near-sdk.io/contract-interface/serialization-interface#overriding-serialization-protocol-default
+// see https://www.near-sdk.io/best-practices#reuse-crates-from-near-sdk
 #[cfg_attr(test, derive(Debug))] // add Debug trait for this struct only when running tests
-#[derive(Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(BorshSerialize, BorshDeserialize, Serialize)]
+#[serde(crate = "near_sdk::serde")]
 pub struct ArticleMeta {
     pub title: String,
-    pub author: AccountId,
+    pub author: String,
     pub editors: Vec<AccountId>,
     pub published_date: u64,
 }
@@ -33,27 +39,4 @@ pub struct Rating {
 pub enum RatingAction {
     Upvote,
     Downvote,
-}
-
-#[cfg(test)]
-#[cfg_attr(test, derive(Debug))]
-#[derive(Serialize, Deserialize)]
-pub struct ParsedReceiptTransfer {
-    pub deposit: u128,
-}
-
-#[cfg(test)]
-#[cfg_attr(test, derive(Debug))]
-#[derive(Serialize, Deserialize)]
-#[allow(non_snake_case)]
-pub struct ParsedReceiptAction {
-    pub Transfer: ParsedReceiptTransfer,
-}
-
-#[cfg(test)]
-#[cfg_attr(test, derive(Debug))]
-#[derive(Serialize, Deserialize)]
-pub struct ParsedReceipt<'a> {
-    pub receiver_id: &'a str,
-    pub actions: Vec<ParsedReceiptAction>,
 }
