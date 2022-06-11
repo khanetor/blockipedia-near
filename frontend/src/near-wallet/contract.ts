@@ -5,6 +5,7 @@ import { ArticleMeta, CArticle, ExtendedContract } from "../components/nearAuth/
 
 
 export type ISmartContract = {
+    accountId: string
     authenticated: boolean
     login: () => Promise<void>
     logout: () => void,
@@ -21,6 +22,8 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
     }) as ExtendedContract
 
     const authenticated =  wallet.isSignedIn()
+
+    const accountId: string = wallet.getAccountId()
 
     async function login() {
         await signIn(wallet)
@@ -66,6 +69,6 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
     }
 
     return {
-        authenticated, login, logout, getArticles, getArticle, createArticle, donate
+        accountId, authenticated, login, logout, getArticles, getArticle, createArticle, donate
     }
 }

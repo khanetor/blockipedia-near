@@ -2,10 +2,12 @@ import { Buffer } from "buffer"
 import * as React from "react"
 import { useEffect } from "react"
 import { providers } from "near-api-js"
-import { NEARAuthRoute } from "../../components/nearAuth"
+import { NEARAuthRoute, useContract } from "../../components/nearAuth"
 import { navigate } from "gatsby"
 
 export default function (props: { location: { search: string } }) {
+
+    const contract = useContract()
 
     useEffect(() => {
         const query = new URLSearchParams(props.location.search)
@@ -13,13 +15,11 @@ export default function (props: { location: { search: string } }) {
         const txHash = query.get("transactionHashes")
 
         const provider = new providers.JsonRpcProvider(process.env.NEAR_RPC_URL)
-
-        provider.txStatus(txHash!, "khanguyen.testnet").then(result => {
+        provider.txStatus(txHash!, contract!.accountId).then(result => {
             const value = (result.status as providers.FinalExecutionStatus).SuccessValue
             const articleId = Buffer.from(value!, "base64").toString()
             navigate(`/read/${articleId}`)
         })
-
     }, [])
 
     return <NEARAuthRoute>
