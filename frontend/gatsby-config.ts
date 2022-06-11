@@ -10,10 +10,6 @@ if (process.env.DOTENV_PATH) {
 
 import type { GatsbyConfig } from "gatsby";
 
-console.log(process.env.DOTENV_PATH);
-console.log(`${process.env.GATSBY_HOSTNAME!}${process.env.GATSBY_PATH_PREFIX!}`)
-console.log(require("dotenv"));
-
 const config: GatsbyConfig = {
   siteMetadata: {
     title: process.env.GATSBY_APP_NAME,
