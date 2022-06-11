@@ -14,7 +14,7 @@ export default function (props: { location: { search: string } }) {
         const _ = query.get("signMeta")
         const txHash = query.get("transactionHashes")
 
-        const provider = new providers.JsonRpcProvider(process.env.NEAR_RPC_URL)
+        const provider = new providers.JsonRpcProvider(process.env.NEAR_NODE_URL)
         provider.txStatus(txHash!, contract!.accountId).then(result => {
             const value = (result.status as providers.FinalExecutionStatus).SuccessValue
             const articleId = Buffer.from(value!, "base64").toString()
