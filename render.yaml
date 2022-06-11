@@ -4,13 +4,13 @@ services:
 - type: web
   name: blockipedia
   env: static
-  buildCommand: cd frontend; yarn; yarn build
+  buildCommand: make build-frontend
   staticPublishPath: ./frontend/public
   pullRequestPreviewsEnabled: true  # see https://render.com/docs/pull-request-previews
   envVars:
   - key: GATSBY_CONTRACT_ADDRESS
     value: test.blockipedia.testnet
-    previewValue: dev-1654392200283-45248039192531  # only applicable to PreviewEnvironments
+    previewValue: dev-1654959502639-42307933260659  # only applicable to PreviewEnvironments
   - key: GATSBY_PATH_PREFIX
     value: /
     previewValue: /  # only applicable to PreviewEnvironments

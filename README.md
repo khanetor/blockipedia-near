@@ -6,6 +6,34 @@ A wikipedia on NEAR Protocol
 ## Visit the Blockipedia page
 https://nlhkh.github.io/blockipedia-near/
 
+# How to develop locally
+
+## Backend (smart contract on NEAR rust sdk)
+
+Prerequisites:
+- [near-cli](https://www.npmjs.com/package/near-cli)
+- [rustc](https://www.rust-lang.org/tools/install)
+
+```
+make add-target
+make build
+make dev-deploy
+```
+
+## Frontend (Gatsby React app)
+
+Prerequisites:
+- [Node.js](https://nodejs.dev/learn/how-to-install-nodejs)
+- [yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
+
+All frontend resources are under `./frontend` directory
+For local development, Gatsby expects env vars from the `.env.development` file
+Feel free to copy from `.env.development.sample` and make any change you need
+
+```bash
+make dev-frontend
+```
+
 # How to run tests
 
 ## Run tests against the entire suite
