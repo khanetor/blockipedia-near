@@ -1,14 +1,14 @@
 import { Link } from "gatsby"
 import React from "react"
 
-export type Article = {
+export type ArticleMeta = {
     id: number,
     author: string,
     title: string,
     date: Date
 }
 
-export default function (props: { article: Article }) {
+export default function (props: { article: ArticleMeta }) {
     const article = props.article
     const articleDate = article.date.toDateString()
 
