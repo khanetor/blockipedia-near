@@ -48,7 +48,7 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
 
     async function createArticle(title: string, content: string): Promise<void> {
         await contract.create_article({
-            callbackUrl: `${process.env.GATSBY_HOSTNAME!}${process.env.GATSBY_PATH_PREFIX!}write/callback`,
+            callbackUrl: `${process.env.GATSBY_HOSTNAME!}/write/callback`,
             meta: "articleCreated",
             args: {
                 title, content
@@ -60,7 +60,7 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
 
     async function donate(articleId: number, amount: number): Promise<void> {
         await contract.donate({
-            callbackUrl: `${process.env.HOSTNAME!}/read/${articleId}`,
+            callbackUrl: `${process.env.GATSBY_HOSTNAME!}/read/${articleId}`,
             meta: "donated",
             args: {
                 article_id: articleId
