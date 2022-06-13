@@ -13,7 +13,7 @@ import type { GatsbyConfig } from "gatsby";
 const config: GatsbyConfig = {
   siteMetadata: {
     title: process.env.GATSBY_APP_NAME,
-    siteUrl: `${process.env.GATSBY_HOSTNAME!}${process.env.GATSBY_PATH_PREFIX!}`
+    siteUrl: `${process.env.GATSBY_HOSTNAME!}`
   },
   pathPrefix: process.env.GATSBY_PATH_PREFIX, // e.g. `/blockipedia-near` when served by GitHub Pages
   plugins: [
