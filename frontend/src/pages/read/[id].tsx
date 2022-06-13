@@ -8,52 +8,51 @@ import { MarkdownRenderer } from "../../components/markdown"
 
 import ArrowUp from "../../assets/svg/arrow-up.svg"
 import ArrowDown from "../../assets/svg/arrow-down.svg"
-
-type ArticleDetail = {
-    id: number,
-    title: string,
-    content: string,
-    author: string,
-    publishedDate: Date
-}
+import { Article } from "../../components/nearAuth/extendedContract"
 
 enum VoteAction {
     UP, DOWN
 }
 
+function convertToDateString(time: number) {
+    return new Date(time / 1000000).toDateString()
+}
+
 export default function (props: { id: string }) {
     const _id = parseInt(props.id)
-    const [article, setArticle] = useState<ArticleDetail | undefined>(undefined)
-    const [upvote, setUpvote] = useState<number>(1000)
-    const [downvote, setDownvote] = useState<number>(1000)
+    const [article, setArticle] = useState<Article | undefined>(undefined)
+    const [upvote, setUpvote] = useState<number>(0)
+    const [upvoting, setUpvoting] = useState<boolean>(false)
+    const [downvote, setDownvote] = useState<number>(0)
+    const [downvoting, setDownvoting] = useState<boolean>(false)
 
     const [showDonation, setShowDonation] = useState(false)
 
     const contract = useContract()
 
-    function vote(action: VoteAction) {
+    async function vote(action: VoteAction) {
         switch (action) {
             case VoteAction.UP:
-                return setTimeout(function () {
-                    setUpvote(upvote + 1)
-                }, 0)
+                setUpvoting(true)
+                await contract.upvote(article!.id)
+                setUpvote(upvote + 1)
+                setUpvoting(false)
+                break
             case VoteAction.DOWN:
-                return setTimeout(function () {
-                    setDownvote(downvote + 1)
-                }, 0)
+                setDownvoting(true)
+                await contract.downvote(article!.id)
+                setDownvote(downvote + 1)
+                setDownvoting(false)
+                break
         }
     }
 
     useEffect(function () {
         // Fetch article from contract
-        contract?.getArticle(_id).then(article => {
-            setArticle({
-                id: article.id,
-                title: article.title,
-                content: article.content,
-                author: article.author,
-                publishedDate: new Date(article.published_date / 1000000)
-            })
+        contract.getArticle(_id).then(article => {
+            setArticle(article)
+            setUpvote(article.upvote)
+            setDownvote(article.downvote)
         })
     }, [])
 
@@ -67,12 +66,12 @@ export default function (props: { id: string }) {
                     <div className={headerInfo}>
                         <div>
                             <div>{article.author}</div>
-                            <div>{article.publishedDate.toDateString()}</div>
+                            <div>{convertToDateString(article.published_date)}</div>
                         </div>
                         <div className={headerRating} >
-                            <button onClick={vote.bind(null, VoteAction.UP)}><ArrowUp /></button>
+                            <button disabled={upvoting} onClick={() => vote(VoteAction.UP)}><ArrowUp /></button>
                             {upvote}
-                            <button onClick={vote.bind(null, VoteAction.DOWN)}><ArrowDown /></button>
+                            <button disabled={downvoting} onClick={() => vote(VoteAction.DOWN)}><ArrowDown /></button>
                             {downvote}
                         </div>
                     </div>
@@ -94,7 +93,7 @@ export default function (props: { id: string }) {
                 show={showDonation}
                 articleId={article.id}
                 dismiss={setShowDonation.bind(null, false)}
-                donate={contract!.donate}></DonationModal>
+                donate={contract.donate}></DonationModal>
         </NEARAuthRoute>
     } else {
         return <NEARAuthRoute>

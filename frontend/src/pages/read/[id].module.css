@@ -14,8 +14,12 @@
   @apply flex flex-row items-center ml-3;
 }
 
+.headerRating button:disabled {
+  @apply animate-bounce;
+}
+
 .headerAction button {
-    @apply text-white bg-green-700 text-lg font-semibold p-3 rounded-2xl;
+  @apply text-white bg-green-700 text-lg font-semibold p-3 rounded-2xl;
 }
 
 .titleSection {
