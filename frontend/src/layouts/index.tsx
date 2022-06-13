@@ -5,13 +5,13 @@ import { ContractProvider, useContract } from "../components/nearAuth"
 import { header, links, link, linkAction, branding } from "./index.module.css"
 
 function HeadNav() {
-    const wallet = useContract()
+    const contract = useContract()
 
     function getStarted() {
-        if (wallet?.authenticated) {
+        if (contract.authenticated) {
             navigate("/write")
         } else {
-            wallet?.login()
+            contract.login()
         }
     }
 
@@ -20,9 +20,9 @@ function HeadNav() {
         <div className={links}>
             <Link className={link} to="/story">Our story</Link>
             <Link className={link} to="/write">Write</Link>
-            {wallet!.authenticated ?
-                <a className={link} onClick={wallet!.logout}>Sign-out</a> :
-                <a className={link} onClick={wallet!.login}>Sign-in</a>}
+            {contract.authenticated ?
+                <a className={link} onClick={contract.logout}>Sign-out</a> :
+                <a className={link} onClick={contract.login}>Sign-in</a>}
             <a className={linkAction} onClick={getStarted}>Get started</a>
         </div>
     </nav>

@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react"
 import { Contract, utils, WalletConnection } from "near-api-js"
 import { signIn, signOut } from "."
-import { ArticleMeta, CArticle, ExtendedContract } from "../components/nearAuth/extendedContract"
+import { ArticleMeta, Article, ExtendedContract } from "../components/nearAuth/extendedContract"
 
 
 export type ISmartContract = {
@@ -10,9 +10,11 @@ export type ISmartContract = {
     login: () => Promise<void>
     logout: () => void,
     getArticles: () => Promise<ArticleMeta[]>
-    getArticle: (id: number) => Promise<CArticle>
+    getArticle: (id: number) => Promise<Article>
     createArticle: (title: string, content: string) => Promise<void>
     donate: (articleId: number, amount: number) => Promise<void>
+    upvote: (articleId: number) => Promise<void>
+    downvote: (articleId: number) => Promise<void>
 }
 
 export function buildContractInterface(wallet: WalletConnection, setAuthenticated: Dispatch<SetStateAction<boolean>>): ISmartContract {
@@ -21,7 +23,7 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
         changeMethods: ["create_article", "update_article", "upvote", "downvote", "donate"]
     }) as ExtendedContract
 
-    const authenticated =  wallet.isSignedIn()
+    const authenticated = wallet.isSignedIn()
 
     const accountId: string = wallet.getAccountId()
 
@@ -35,18 +37,18 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
     }
 
     async function getArticles(): Promise<ArticleMeta[]> {
-        return await contract!.get_articles()
+        return await contract.get_articles()
     }
 
-    async function getArticle(id: number): Promise<CArticle> {
-        return await contract!.get_article({
+    async function getArticle(id: number): Promise<Article> {
+        return await contract.get_article({
             article_id: id
         })
     }
 
     async function createArticle(title: string, content: string): Promise<void> {
-        await contract!.create_article({
-            callbackUrl: `${process.env.GATSBY_HOSTNAME!}${process.env.GATSBY_PATH_PREFIX!}write/callback`,
+        await contract.create_article({
+            callbackUrl: `${process.env.GATSBY_HOSTNAME!}/write/callback`,
             meta: "articleCreated",
             args: {
                 title, content
@@ -57,8 +59,8 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
     }
 
     async function donate(articleId: number, amount: number): Promise<void> {
-        await contract!.donate({
-            callbackUrl: `${process.env.HOSTNAME!}/read/${articleId}`,
+        await contract.donate({
+            callbackUrl: `${process.env.GATSBY_HOSTNAME!}/read/${articleId}`,
             meta: "donated",
             args: {
                 article_id: articleId
@@ -68,7 +70,15 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
         })
     }
 
+    async function upvote(articleId: number): Promise<void> {
+        await contract.upvote({ article_id: articleId })
+    }
+
+    async function downvote(articleId: number): Promise<void> {
+        await contract.downvote({ article_id: articleId })
+    }
+
     return {
-        accountId, authenticated, login, logout, getArticles, getArticle, createArticle, donate
+        accountId, authenticated, login, logout, getArticles, getArticle, createArticle, donate, upvote, downvote
     }
 }
