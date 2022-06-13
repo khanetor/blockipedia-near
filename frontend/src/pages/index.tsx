@@ -12,7 +12,7 @@ export default function () {
   const contract = useContract()
 
   useEffect(function () {
-    contract?.getArticles()
+    contract.getArticles()
       .then(articles => articles.map(article => ({
         id: article[0],
         author: article[1].author,

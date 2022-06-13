@@ -34,13 +34,13 @@ export default function (props: { id: string }) {
         switch (action) {
             case VoteAction.UP:
                 setUpvoting(true)
-                await contract?.upvote(article!.id)
+                await contract.upvote(article!.id)
                 setUpvote(upvote + 1)
                 setUpvoting(false)
                 break
             case VoteAction.DOWN:
                 setDownvoting(true)
-                await contract?.downvote(article!.id)
+                await contract.downvote(article!.id)
                 setDownvote(downvote + 1)
                 setDownvoting(false)
                 break
@@ -49,7 +49,7 @@ export default function (props: { id: string }) {
 
     useEffect(function () {
         // Fetch article from contract
-        contract?.getArticle(_id).then(article => {
+        contract.getArticle(_id).then(article => {
             setArticle(article)
             setUpvote(article.upvote)
             setDownvote(article.downvote)
@@ -93,7 +93,7 @@ export default function (props: { id: string }) {
                 show={showDonation}
                 articleId={article.id}
                 dismiss={setShowDonation.bind(null, false)}
-                donate={contract!.donate}></DonationModal>
+                donate={contract.donate}></DonationModal>
         </NEARAuthRoute>
     } else {
         return <NEARAuthRoute>

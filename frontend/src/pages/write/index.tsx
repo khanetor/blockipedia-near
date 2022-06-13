@@ -17,7 +17,7 @@ export default function () {
     }
 
     function publish() {
-        contract?.createArticle(title, content)
+        contract.createArticle(title, content)
     }
 
     const render: string = content.length > 0 ? content : "Preview"
