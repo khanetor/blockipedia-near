@@ -60,7 +60,7 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
 
     async function donate(articleId: number, amount: number): Promise<void> {
         await contract.donate({
-            callbackUrl: `${process.env.GATSBY_HOSTNAME!}/read/${articleId}`,
+            callbackUrl: `${process.env.GATSBY_ROOT!}/read/${articleId}`,
             meta: "donated",
             args: {
                 article_id: articleId
