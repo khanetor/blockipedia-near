@@ -15,7 +15,6 @@ Prerequisites:
 - [rustc](https://www.rust-lang.org/tools/install)
 
 ```
-make add-target
 make build
 make dev-deploy
 ```
