@@ -50,7 +50,7 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
 
         // ensure we don't have double slashes later when concating the strings
         let pathPrefix = process.env.GATSBY_PATH_PREFIX || ""
-        if (pathPrefix.endsWith("/")) pathPrefix = pathPrefix.substring(0, -1)
+        if (pathPrefix.endsWith("/")) pathPrefix = pathPrefix.substring(0, pathPrefix.length - 1)
 
         await contract.create_article({
             callbackUrl: `${process.env.GATSBY_HOSTNAME!}${pathPrefix}/write/callback`,
