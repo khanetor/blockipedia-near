@@ -10,7 +10,5 @@ services:
   envVars:
   - key: GATSBY_CONTRACT_ADDRESS
     value: test.blockipedia.testnet
-    previewValue: dev-1654959502639-42307933260659  # only applicable to PreviewEnvironments
   - key: GATSBY_PATH_PREFIX
-    value: /
-    previewValue: /  # only applicable to PreviewEnvironments
+    value: ""
