@@ -13,7 +13,7 @@ test-verbose:
 add-target:
 	rustup target add wasm32-unknown-unknown
 
-build:
+build: add-target
 	cargo build --target wasm32-unknown-unknown --release
 
 lint:
@@ -45,3 +45,6 @@ clean:
 # @TODO consider a DX-friendly way to ensure dynamic .env file is supported
 build-frontend:
 	cd frontend && yarn && yarn build
+
+dev-frontend:
+	cd frontend && yarn develop

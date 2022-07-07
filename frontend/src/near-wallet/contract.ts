@@ -47,8 +47,13 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
     }
 
     async function createArticle(title: string, content: string): Promise<void> {
+
+        // ensure we don't have double slashes later when concating the strings
+        let pathPrefix = process.env.GATSBY_PATH_PREFIX || ""
+        if (pathPrefix.endsWith("/")) pathPrefix = pathPrefix.substring(0, pathPrefix.length - 1)
+
         await contract.create_article({
-            callbackUrl: `${process.env.GATSBY_ROOT!}/write/callback`,
+            callbackUrl: `${process.env.GATSBY_HOSTNAME!}${pathPrefix}/write/callback`,
             meta: "articleCreated",
             args: {
                 title, content

@@ -23,3 +23,6 @@ neardev/dev-account
 
 # IDE
 /.vscode/*.log
+
+# Gatsby
+frontend/.env.development
