@@ -37,3 +37,15 @@
 .markdownStyle blockquote {
   @apply my-3 py-2 pl-6 border-l-4 bg-slate-200 bg-opacity-50;
 }
+
+.markdownStyle a {
+  @apply underline;
+}
+
+.markdownStyle a:link {
+  @apply text-blue-500;
+}
+
+.markdownStyle a:visited {
+  @apply text-rose-700;
+}

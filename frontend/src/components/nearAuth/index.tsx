@@ -1,39 +1,30 @@
-import { WalletConnection, Contract, utils as NEARUtils } from "near-api-js"
+import { WalletConnection } from "near-api-js"
 import { navigate } from "gatsby"
 import { StaticImage } from "gatsby-plugin-image"
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
-import { getNearWallet, signIn, signOut } from "../../near-wallet"
-import { ArticleMeta, CArticle, ExtendedContract } from "./extendedContract"
+import { getNearWallet } from "../../near-wallet"
+import { buildContractInterface, ISmartContract } from "../../near-wallet/contract"
 
-type ISmartContract = {
-    authenticated: boolean
-    login: () => Promise<void>
-    logout: () => void,
-    getArticles: () => Promise<ArticleMeta[]>
-    getArticle: (id: number) => Promise<CArticle>
-    createArticle: (title: string, content: string) => Promise<void>
-    donate: (articleId: number, amount: number) => Promise<void>
-}
 
 const ContractContext = createContext<ISmartContract | undefined>(undefined)
 
-export function useContract() {
-    return useContext(ContractContext)
+export function useContract(): ISmartContract {
+    const context = useContext(ContractContext)
+
+    if (context === undefined) {
+        throw new Error("Contract is not ready!")
+    } else {
+        return context
+    }
 }
 
 export function ContractProvider(props: { children: ReactNode }) {
     const [wallet, setWallet] = useState<WalletConnection | undefined>(undefined)
-    const [contract, setContract] = useState<ExtendedContract | undefined>(undefined)
-    const [authenticated, setAuthenticated] = useState<boolean>(false)
+    const [_, setAuthenticated] = useState<boolean>(false)
 
     useEffect(function () {
         getNearWallet().then(w => {
             setAuthenticated(w.isSignedIn())
-            const c = new Contract(w.account(), process.env.GATSBY_CONTRACT_ADDRESS!, {
-                viewMethods: ["get_article", "get_articles"],
-                changeMethods: ["create_article", "update_article", "upvote", "downvote", "donate"]
-            })
-            setContract(c as ExtendedContract)
             setWallet(w)
         })
     }, [])
@@ -41,51 +32,8 @@ export function ContractProvider(props: { children: ReactNode }) {
     if (wallet === undefined) {
         return <div>Loading wallet...</div>
     } else {
-        async function login() {
-            await signIn(wallet!)
-        }
-
-        function logout() {
-            signOut(wallet!)
-            setAuthenticated(wallet!.isSignedIn())
-        }
-
-        async function getArticles(): Promise<ArticleMeta[]> {
-            return await contract!.get_articles()
-        }
-
-        async function getArticle(id: number): Promise<CArticle> {
-            return await contract!.get_article({
-                article_id: id
-            })
-        }
-
-        async function createArticle(title: string, content: string): Promise<void> {
-            await contract!.create_article({
-                callbackUrl: `${process.env.GATSBY_HOSTNAME!}${process.env.GATSBY_PATH_PREFIX!}`,
-                meta: "Article created",
-                args: {
-                    title, content
-                },
-                gas: "300000000000000",
-                amount: NEARUtils.format.parseNearAmount("2")!
-            })
-        }
-
-        async function donate(articleId: number, amount: number): Promise<void> {
-            await contract!.donate({
-                callbackUrl: `${process.env.HOSTNAME!}/read/${articleId}`,
-                meta: "Article donated",
-                args: {
-                    article_id: articleId
-                },
-                gas: "300000000000000",
-                amount: NEARUtils.format.parseNearAmount(amount.toString())!
-            })
-        }
-
-        const smartContract: ISmartContract = { authenticated, login, logout, getArticles, getArticle, createArticle, donate }
-        return <ContractContext.Provider value={smartContract}>
+        const contract = buildContractInterface(wallet, setAuthenticated)
+        return <ContractContext.Provider value={contract}>
             {props.children}
         </ContractContext.Provider>
     }
@@ -96,21 +44,21 @@ export function NEARAuthRoute(props: { children: ReactNode }) {
 }
 
 export function NEARAuth(props: { children: ReactNode, redirect: boolean }) {
-    const wallet = useContract()
+    const contract = useContract()
 
     useEffect(function () {
-        if (props.redirect && !wallet!.authenticated) {
+        if (props.redirect && !contract.authenticated) {
             navigate("/")
         }
     }, [])
 
-    if (wallet?.authenticated) {
+    if (contract.authenticated) {
         return <>{props.children}</>
     } else {
         return <div className="flex flex-col items-center justify-center h-72 gap-6 pt-6">
             <StaticImage src="../../images/logo.png" alt="logo" width={300} height={300}></StaticImage>
             <div className="font-open-sans text-xl font-semibold">Please sign-in with your NEAR wallet to get started.</div>
-            <button className="bg-green-700 text-white p-4 rounded-2xl" onClick={wallet?.login}>Sign-in</button>
+            <button className="bg-green-700 text-white p-4 rounded-2xl" onClick={contract.login}>Sign-in</button>
         </div>
     }
 }

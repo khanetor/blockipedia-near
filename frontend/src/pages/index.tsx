@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
 
-import ArticleView, { Article } from "../components/article"
+import ArticleView, { ArticleMeta } from "../components/article"
 import Landing from "../components/landing"
 import { NEARAuth, useContract } from "../components/nearAuth"
 
 import { content } from "./index.module.css"
 
 export default function () {
-  const [articles, setArticles] = useState<Article[]>([])
+  const [articles, setArticles] = useState<ArticleMeta[]>([])
   const contract = useContract()
 
   useEffect(function () {
-    contract!.getArticles()
+    contract.getArticles()
       .then(articles => articles.map(article => ({
         id: article[0],
         author: article[1].author,
