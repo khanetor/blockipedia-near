@@ -23,6 +23,14 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
         changeMethods: ["create_article", "update_article", "upvote", "downvote", "donate"]
     }) as ExtendedContract
 
+    // ensure we don't have double slashes as we concatenate the callbackUrl value for some of the
+    // contract methods
+    let pathPrefix = process.env.GATSBY_PATH_PREFIX || ""
+    if (pathPrefix.endsWith("/")) pathPrefix = pathPrefix.substring(0, pathPrefix.length - 1)
+
+    // this is akin to gatsby's siteUrl
+    const appRoot = `${process.env.GATSBY_HOSTNAME!}${pathPrefix}`
+
     const authenticated = wallet.isSignedIn()
 
     const accountId: string = wallet.getAccountId()
@@ -47,13 +55,8 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
     }
 
     async function createArticle(title: string, content: string): Promise<void> {
-
-        // ensure we don't have double slashes later when concating the strings
-        let pathPrefix = process.env.GATSBY_PATH_PREFIX || ""
-        if (pathPrefix.endsWith("/")) pathPrefix = pathPrefix.substring(0, pathPrefix.length - 1)
-
         await contract.create_article({
-            callbackUrl: `${process.env.GATSBY_HOSTNAME!}${pathPrefix}/write/callback`,
+            callbackUrl: `${appRoot}/write/callback`,
             meta: "articleCreated",
             args: {
                 title, content
@@ -65,7 +68,7 @@ export function buildContractInterface(wallet: WalletConnection, setAuthenticate
 
     async function donate(articleId: number, amount: number): Promise<void> {
         await contract.donate({
-            callbackUrl: `${process.env.GATSBY_ROOT!}/read/${articleId}`,
+            callbackUrl: `${appRoot}/read/${articleId}`,
             meta: "donated",
             args: {
                 article_id: articleId
