@@ -48,7 +48,7 @@
     "gatsby-plugin-sitemap": "^5.16.0",
     "gatsby-source-filesystem": "^4.16.0",
     "gatsby-transformer-sharp": "^4.16.0",
-    "gh-pages": "^4.0.0",
+    "gh-pages": "^5.0.0",
     "postcss": "^8.4.31",
     "typed-css-modules": "^0.7.2",
     "typescript": "^4.7.3"
